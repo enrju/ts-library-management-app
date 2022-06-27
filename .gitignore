@@ -4,3 +4,4 @@
 # --- BACK ---
 /backend/dist
 /backend/node_modules
+/backend/config/config.ts
