@@ -1,1 +1,6 @@
+# --- DOCS ---
 /docs
+
+# --- BACK ---
+/backend/dist
+/backend/node_modules
