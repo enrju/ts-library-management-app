@@ -5,6 +5,7 @@ import {config} from "./config/config";
 import {pool} from "./utils/db";
 import {loginRouter} from "./routers/login.router";
 import {logoutRouter} from "./routers/logout.router";
+import {apiUsersRouter} from "./routers/api.users.router";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //routing
 app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
+app.use('/api', apiUsersRouter);
 
 //test db-connection
 (async () => {
