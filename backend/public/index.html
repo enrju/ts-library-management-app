@@ -8,6 +8,64 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Testowa strona główna</h1>
+    <script>
+        const getObjectOfCookies = () => {
+            const arrStr = (decodeURIComponent(document.cookie)).split('; ');
+
+            arrStr.forEach((item, index) => {
+                arrStr[index] = item.split('=');
+            });
+
+            arrStr.forEach((item, index) => {
+                if(index < arrStr.length - 1) {
+                    arrStr[index] = '"' + item[0] + '":"' + item[1] + '",';
+                } else {
+                    arrStr[index] = '"' + item[0] + '":"' + item[1] + '"';
+                }
+            });
+
+            let str = "{";
+            arrStr.forEach(item => {
+                str += item;
+            });
+            str += "}";
+
+            return JSON.parse(str);
+        }
+
+        const cookies = getObjectOfCookies();
+        console.log(cookies);
+        const h1 = document.createElement("h1");
+
+        if(cookies.visitor_id) {
+            const button = document.createElement("button");
+            button.textContent = "Wyloguj";
+            button.addEventListener("click", () => {
+                console.log("wylogowanie usera");
+            })
+            document.body.appendChild(button);
+
+            h1.textContent = `Witaj: ${cookies.login}`;
+            document.body.appendChild(h1);
+
+            const div = document.createElement("div");
+            switch(cookies.role) {
+                case 'user':
+                    div.textContent = "Panel usera";
+                    break;
+                case 'admin':
+                    div.textContent = "Panel admina";
+                    break;
+                default:
+                    div.textContent = "Nie ma takiego panelu";
+            }
+            document.body.appendChild(div);
+        } else {
+            h1.textContent = 'Brak dostępu - musisz być zalogowany';
+            document.body.appendChild(h1);
+        }
+
+
+    </script>
 </body>
 </html>
