@@ -34,15 +34,27 @@
         }
 
         const cookies = getObjectOfCookies();
-        console.log(cookies);
+        // console.log(cookies);
         const h1 = document.createElement("h1");
 
         if(cookies.visitor_id) {
             const button = document.createElement("button");
             button.textContent = "Wyloguj";
-            button.addEventListener("click", () => {
-                console.log("wylogowanie usera");
-            })
+            button.addEventListener("click", async () => {
+                // console.log("wylogowanie usera");
+                await fetch('/logout', {
+                    method: 'POST',
+                    // body: JSON.stringify({
+                    //     login,
+                    //     password,
+                    // }),
+                    // headers: {
+                    //     'Content-Type': 'application/json',
+                    // }
+                });
+
+                window.location = '/';
+            });
             document.body.appendChild(button);
 
             h1.textContent = `Witaj: ${cookies.login}`;
