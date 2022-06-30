@@ -32,6 +32,14 @@ class Sessions {
         if(foundSession) return foundSession.role;
         else return undefined;
     };
+
+    remove(id: string): void {
+        const index = this.sessions.findIndex(item => item.id === id);
+
+        if(index > -1) {
+            this.sessions.splice(index, 1);
+        }
+    }
 };
 
 export const session = new Sessions();
