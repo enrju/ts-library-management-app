@@ -1,9 +1,10 @@
-import express, {NextFunction, Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
+import {session} from "./sessions";
 
 export const checkCookie = (req: Request, res: Response, next: NextFunction) => {
-    const {visitor_logged} = req.cookies;
+    const {session_id} = req.cookies;
 
-    if(!visitor_logged) {
+    if(!session_id && !session.isExist(session_id)) {
         res.redirect('/login');
         return;
     }

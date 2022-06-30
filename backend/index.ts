@@ -16,7 +16,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 //routing
-app.use('/', mainPageRouter);   //catch cookie
+app.use('/', mainPageRouter);   //check cookie
 
 //temporary front-end
 app.use(express.static(path.join(__dirname, 'public')));
