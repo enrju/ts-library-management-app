@@ -1,8 +1,8 @@
 import express, {NextFunction, Request, Response} from "express";
-import {checkCookie} from "../utils/check-cookie";
+import {Cookies} from "../utils/cookies";
 
 export const mainPageRouter = express.Router();
 
 mainPageRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-    checkCookie(req, res, next);
+    Cookies.checkSession(req, res, next);
 });
