@@ -26,11 +26,11 @@ app.use('/logout', logoutRouter);
 app.use('/api', apiUsersRouter);
 app.use('/api', apiBooksRouter);
 
-//test db-connection
-(async () => {
-    const [results] = await pool.execute("SELECT * FROM `users`");
-    console.log(results);
-})();
+// //test db-connection
+// (async () => {
+//     const [results] = await pool.execute("SELECT * FROM `users`");
+//     console.log(results);
+// })();
 
 app.listen(config.listenPort, config.listenHost, () => {
     console.log('Server is working...');

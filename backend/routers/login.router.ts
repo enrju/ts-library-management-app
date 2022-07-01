@@ -2,6 +2,7 @@ import express, {Request, Response} from "express";
 import path from "path";
 import {pool} from "../utils/db";
 import {session} from "../utils/sessions";
+import {UserRecord} from "../records/user.record";
 
 export const loginRouter = express.Router();
 
@@ -14,16 +15,9 @@ loginRouter.get('/', (req: Request, res: Response) => {
 loginRouter.post('/', (req: Request, res: Response) => {
     const {login, password} = req.body;
 
-    //1. pobierz usera wg login z DB (id, login, password)
     (async () => {
-        const [results]: any = await pool.execute(
-            "SELECT `users`.`id`,`login`,`password`,`name` AS `role` FROM `users`" +
-            "JOIN `user_roles` ON `users`.`user_role_id` = `user_roles`.`id`" +
-            " WHERE `login` = :login", {
-            login: login,
-        });
-
-        const user = results[0];
+        //1. pobierz usera wg login z DB (id, login, password)
+        const user = await UserRecord.find(login);
 
         //2. sprawdź czy hasło się zgadza
         if(user && password === user.password) {
