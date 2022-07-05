@@ -6,6 +6,13 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
     <script>
@@ -33,24 +40,99 @@
             return JSON.parse(str);
         }
 
+        const getUserPanel = async (div) => {
+            const res = await fetch('/user-panel.html', {
+                method: 'GET',
+            });
+
+            const data = await res.text();
+
+            div.innerHTML = data;
+        }
+
+        const getUserBooks = async () => {
+            // --- user books ---
+            const resUserBooks = await fetch(`/api/users/${cookies.visitor_id}/books`, {
+                method: 'GET',
+            });
+
+            const dataUserBooks = await resUserBooks.json();
+
+            const panel = document.querySelector(".panel");
+            const ulReservedBooks = document.querySelector(".user-books-reserved");
+            const ulRentedBooks = document.querySelector(".user-books-rented");
+            const ulBooksInLibrary = document.querySelector(".books-in-library");
+
+            if(dataUserBooks.access === false) {
+                panel.textContent = "Brak dostępu, lub sesja wygasła"
+            } else {
+                if(dataUserBooks) {
+                    const reservedBooks = dataUserBooks.filter(item => item.state === 'reserved');
+
+                    if(reservedBooks.length > 0) {
+                        reservedBooks.forEach((item, index) => {
+                            const li = document.createElement("li");
+                            li.textContent =
+                                String(index + 1) + " | " +
+                                item.name_surname + " | " +
+                                item.title + " | " +
+                                "ważne do: " + item.return_until.substring(0, 10) + " |";
+                            ulReservedBooks.appendChild(li);
+                        });
+                    }
+
+                    const rentedBooks = dataUserBooks.filter(item => item.state === 'rented');
+
+                    if(rentedBooks.length > 0) {
+                        rentedBooks.forEach((item, index) => {
+                            const li = document.createElement("li");
+                            li.textContent =
+                                String(index + 1) + " | " +
+                                item.name_surname + " | " +
+                                item.title + " | " +
+                                "oddaj do: " + item.return_until.substring(0, 10) + " |";
+                            ulRentedBooks.appendChild(li);
+                        });
+                    }
+
+                }
+            }
+
+            // --- all books ---
+            const resAllBooks = await fetch(`/api/books`, {
+                method: 'GET',
+            });
+
+            const dataAllBooks = await resAllBooks.json();
+
+            if(dataAllBooks.access === false) {
+                panel.textContent = "Brak dostępu, lub sesja wygasła"
+            } else {
+                if(dataAllBooks) {
+                    if(dataAllBooks.length > 0) {
+                        dataAllBooks.forEach((item, index) => {
+                            const li = document.createElement("li");
+                            li.textContent =
+                                String(index + 1) + " | " +
+                                item.name_surname + " | " +
+                                item.title + " | " +
+                                item.state + " |";
+                            ulBooksInLibrary.appendChild(li);
+                        });
+                    }
+                }
+            }
+        }
+
         const cookies = getObjectOfCookies();
-        // console.log(cookies);
         const h1 = document.createElement("h1");
 
         if(cookies.visitor_id) {
             const button = document.createElement("button");
             button.textContent = "Wyloguj";
             button.addEventListener("click", async () => {
-                // console.log("wylogowanie usera");
                 await fetch('/logout', {
                     method: 'POST',
-                    // body: JSON.stringify({
-                    //     login,
-                    //     password,
-                    // }),
-                    // headers: {
-                    //     'Content-Type': 'application/json',
-                    // }
                 });
 
                 window.location = '/';
@@ -63,7 +145,9 @@
             const div = document.createElement("div");
             switch(cookies.role) {
                 case 'user':
-                    div.textContent = "Panel usera";
+                    getUserPanel(div);
+                    getUserBooks();
+
                     break;
                 case 'admin':
                     div.textContent = "Panel admina";
