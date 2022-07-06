@@ -42,4 +42,4 @@ class Sessions {
     }
 };
 
-export const session = new Sessions();
+export const createdSessions = new Sessions();

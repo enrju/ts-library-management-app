@@ -1,6 +1,6 @@
 import express, {Request, Response} from "express";
 import path from "path";
-import {session} from "../utils/sessions";
+import {createdSessions} from "../utils/sessions";
 import {UserRecord} from "../records/user.record";
 import {Cookies} from "../utils/cookies";
 
@@ -19,7 +19,7 @@ loginRouter.post('/', (req: Request, res: Response) => {
         const user = await UserRecord.find(login);
 
         if(user && password === user.password) {
-            const session_id = session.add(user.role);
+            const session_id = createdSessions.add(user.role);
 
             Cookies.create(res, {
                 visitor_id: user.id,

@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {session} from "./sessions";
+import {createdSessions} from "./sessions";
 
 export interface CookiesEntries {
     visitor_id: string;
@@ -28,11 +28,16 @@ export class Cookies {
     static checkSession(req: Request, res: Response, next: NextFunction) {
         const {session_id} = req.cookies;
 
-        if(!session_id && !session.isExist(session_id)) {
+        if(!session_id
+            || (session_id && !createdSessions.isExist(session_id))) {
             res.redirect('/login');
             return;
         }
 
         next();
+    }
+
+    static getSessionId(req: Request) {
+        return req.cookies.session_id;
     }
 };
