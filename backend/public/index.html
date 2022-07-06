@@ -50,9 +50,9 @@
             div.innerHTML = data;
         }
 
-        const getUserBooks = async () => {
+        const getUserBooks = async (user_id) => {
             // --- user books ---
-            const resUserBooks = await fetch(`/api/users/${cookies.visitor_id}/books`, {
+            const resUserBooks = await fetch(`/api/users/${user_id}/books`, {
                 method: 'GET',
             });
 
@@ -72,11 +72,30 @@
                     if(reservedBooks.length > 0) {
                         reservedBooks.forEach((item, index) => {
                             const li = document.createElement("li");
+
                             li.textContent =
                                 String(index + 1) + " | " +
                                 item.name_surname + " | " +
                                 item.title + " | " +
-                                "ważne do: " + item.return_until.substring(0, 10) + " |";
+                                "ważne do: " + item.return_until.substring(0, 10) + " | ";
+
+                            const btn = document.createElement("button");
+                            btn.textContent = "Anuluj";
+                            btn.addEventListener("click", async e => {
+                                e.preventDefault();
+                                const id = item.id;
+                                const activity = 'cancel';
+
+                                const res = await fetch(`/api/books/${id}/state/${activity}`, {
+                                    method: 'PATCH',
+                                });
+
+                                const data = await res.json();
+
+                                location.reload();
+                            });
+                            li.appendChild(btn);
+
                             ulReservedBooks.appendChild(li);
                         });
                     }
@@ -116,7 +135,27 @@
                                 String(index + 1) + " | " +
                                 item.name_surname + " | " +
                                 item.title + " | " +
-                                item.state + " |";
+                                item.state + " | ";
+
+                            if(item.state === 'available') {
+                                const btn = document.createElement("button");
+                                btn.textContent = "Rezerwuj";
+                                btn.addEventListener("click", async e => {
+                                    e.preventDefault();
+                                    const id = item.id;
+                                    const activity = 'reserve';
+
+                                    const res = await fetch(`/api/books/${id}/state/${activity}`, {
+                                        method: 'PATCH',
+                                    });
+
+                                    const data = await res.json();
+
+                                    location.reload();
+                                });
+                                li.appendChild(btn);
+                            }
+
                             ulBooksInLibrary.appendChild(li);
                         });
                     }
@@ -146,7 +185,7 @@
             switch(cookies.role) {
                 case 'user':
                     getUserPanel(div);
-                    getUserBooks();
+                    getUserBooks(cookies.visitor_id);
 
                     break;
                 case 'admin':
