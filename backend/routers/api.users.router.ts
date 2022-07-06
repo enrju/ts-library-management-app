@@ -8,7 +8,7 @@ export const apiUsersRouter = express.Router();
 apiUsersRouter.get('/users/:id/books', (req: Request, res: Response, next: NextFunction) => {
     const session_id = Cookies.getSessionId(req);
 
-    let userRole = createdSessions.getRole(session_id);
+    const userRole = createdSessions.getRole(session_id);
 
     if(userRole) {
 

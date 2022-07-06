@@ -8,7 +8,7 @@ export const apiBooksRouter = express.Router();
 apiBooksRouter.get('/books', (req: Request, res: Response) => {
     const session_id = Cookies.getSessionId(req);
 
-    let userRole = createdSessions.getRole(session_id);
+    const userRole = createdSessions.getRole(session_id);
 
     if(userRole) {
 
@@ -26,7 +26,7 @@ apiBooksRouter.get('/books', (req: Request, res: Response) => {
 apiBooksRouter.get('/books/:page/:per_page', (req: Request, res: Response) => {
     const session_id = Cookies.getSessionId(req);
 
-    let userRole = createdSessions.getRole(session_id);
+    const userRole = createdSessions.getRole(session_id);
 
     if(userRole) {
 
@@ -34,5 +34,48 @@ apiBooksRouter.get('/books/:page/:per_page', (req: Request, res: Response) => {
 
     } else {
         res.json({access: false});
+    }
+});
+
+apiBooksRouter.patch('/books/:id/state/:activity', (req: Request, res: Response) => {
+    const session_id = Cookies.getSessionId(req);
+
+    const userRole = createdSessions.getRole(session_id);
+
+    const id = req.params.id;
+    const activity = req.params.activity;
+
+
+    switch(userRole) {
+        case 'user':
+            switch(activity) {
+                case 'cancel':
+
+                    (async () => {
+                        const book = await BookRecord.find(id);
+
+                        await book.update('available');
+
+                        res.json({updated: true});
+                    })();
+
+                    break;
+                case 'reserve':
+
+                    (async () => {
+                        const book = await BookRecord.find(id);
+
+                        await book.update('reserved', req.cookies.visitor_id);
+
+                        res.json({updated: true});
+                    })();
+
+                    break;
+                default:
+                    res.json({access: false});
+            }
+            break;
+        default:
+            res.json({access: false});
     }
 });
