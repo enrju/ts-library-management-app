@@ -50,7 +50,7 @@
             div.innerHTML = data;
         }
 
-        const getUserBooks = async (user_id) => {
+        const getUserBooksForUserPanel = async (user_id) => {
             // --- user books ---
             const resUserBooks = await fetch(`/api/users/${user_id}/books`, {
                 method: 'GET',
@@ -62,6 +62,9 @@
             const ulReservedBooks = document.querySelector(".user-books-reserved");
             const ulRentedBooks = document.querySelector(".user-books-rented");
             const ulBooksInLibrary = document.querySelector(".books-in-library");
+            ulReservedBooks.textContent = "";
+            ulRentedBooks.textContent = "";
+            ulBooksInLibrary.textContent = "";
 
             if(dataUserBooks.access === false) {
                 panel.textContent = "Brak dostępu, lub sesja wygasła"
@@ -163,6 +166,228 @@
             }
         }
 
+        const getAdminPanel = async (div) => {
+            const res = await fetch('/admin-panel.html', {
+                method: 'GET',
+            });
+
+            const data = await res.text();
+
+            div.innerHTML = data;
+
+            const formSearchUser = document.querySelector(".search-user");
+            formSearchUser.addEventListener("submit", async e => {
+                e.preventDefault();
+
+                const login = e.target.elements['user-login'].value;
+
+                if(login.length === 0) {
+                    return;
+                }
+
+                const res = await fetch(`/api/users/login/${login}`, {
+                    method: 'GET',
+                });
+
+                const data = await res.json();
+
+                if(data) {
+                    await getUserBooksForAdminPanel(data.user_id);
+                }
+            })
+        }
+
+        const getUserBooksForAdminPanel = async (user_id) => {
+            // --- user books ---
+            const resUserBooks = await fetch(`/api/users/${user_id}/books`, {
+                method: 'GET',
+            });
+
+            const dataUserBooks = await resUserBooks.json();
+
+            const panel = document.querySelector(".panel");
+            const ulReservedBooks = document.querySelector(".user-books-reserved");
+            const ulRentedBooks = document.querySelector(".user-books-rented");
+            ulReservedBooks.textContent = "";
+            ulRentedBooks.textContent = "";
+
+            if(dataUserBooks.access === false) {
+                panel.textContent = "Brak dostępu, lub sesja wygasła"
+            } else {
+                if(dataUserBooks) {
+                    const reservedBooks = dataUserBooks.filter(item => item.state === 'reserved');
+
+                    if(reservedBooks.length > 0) {
+                        reservedBooks.forEach((item, index) => {
+                            const li = document.createElement("li");
+
+                            li.textContent =
+                                String(index + 1) + " | " +
+                                item.name_surname + " | " +
+                                item.title + " | " +
+                                "ważne do: " + item.return_until.substring(0, 10) + " | ";
+
+                            const btnCancel = document.createElement("button");
+                            btnCancel.textContent = "Anuluj";
+                            btnCancel.addEventListener("click", async e => {
+                                e.preventDefault();
+                                const id = item.id;
+                                const activity = 'cancel';
+
+                                const res = await fetch(`/api/books/${id}/state/${activity}`, {
+                                    method: 'PATCH',
+                                });
+
+                                const data = await res.json();
+
+                                location.reload();
+                            });
+                            li.appendChild(btnCancel);
+
+                            const btnRent = document.createElement("button");
+                            btnRent.textContent = "Wypożycz";
+                            btnRent.addEventListener("click", async e => {
+                                e.preventDefault();
+                                const id = item.id;
+                                const activity = 'rent';
+
+                                const res = await fetch(`/api/books/${id}/state/${activity}`, {
+                                    method: 'PATCH',
+                                });
+
+                                const data = await res.json();
+
+                                location.reload();
+                            });
+                            li.appendChild(btnRent);
+
+                            ulReservedBooks.appendChild(li);
+                        });
+                    }
+
+                    const rentedBooks = dataUserBooks.filter(item => item.state === 'rented');
+
+                    if(rentedBooks.length > 0) {
+                        rentedBooks.forEach((item, index) => {
+                            const li = document.createElement("li");
+                            li.textContent =
+                                String(index + 1) + " | " +
+                                item.name_surname + " | " +
+                                item.title + " | " +
+                                "oddaj do: " + item.return_until.substring(0, 10) + " |";
+
+                            const btnReturn = document.createElement("button");
+                            btnReturn.textContent = "Oddaj";
+                            btnReturn.addEventListener("click", async e => {
+                                e.preventDefault();
+                                const id = item.id;
+                                const activity = 'cancel';
+
+                                const res = await fetch(`/api/books/${id}/state/${activity}`, {
+                                    method: 'PATCH',
+                                });
+
+                                const data = await res.json();
+
+                                location.reload();
+                            });
+                            li.appendChild(btnReturn);
+
+                            ulRentedBooks.appendChild(li);
+                        });
+                    }
+
+                }
+            }
+        }
+
+        const getLibraryBooksForAdminPanel = async () => {
+            // --- all books ---
+            const resAllBooks = await fetch(`/api/books`, {
+                method: 'GET',
+            });
+
+            const dataAllBooks = await resAllBooks.json();
+
+            const panel = document.querySelector(".panel");
+            const ulBooksInLibrary = document.querySelector(".books-in-library");
+            ulBooksInLibrary.textContent = "";
+
+            if(dataAllBooks.access === false) {
+                panel.textContent = "Brak dostępu, lub sesja wygasła"
+            } else {
+                if(dataAllBooks) {
+                    if(dataAllBooks.length > 0) {
+                        dataAllBooks.forEach((item, index) => {
+                            const li = document.createElement("li");
+                            li.textContent =
+                                String(index + 1) + " | " +
+                                item.name_surname + " | " +
+                                item.title + " | " +
+                                item.state + " | ";
+
+                            if(item.state === 'available') {
+                                const btnModify = document.createElement("button");
+                                btnModify.textContent = "Edytuj";
+                                btnModify.addEventListener("click", async e => {
+                                    e.preventDefault();
+                                    const id = item.id;
+                                    const activity = 'modify';
+
+                                    const res = await fetch(`/api/books/${id}/state/${activity}`, {
+                                        method: 'PATCH',
+                                    });
+
+                                    const data = await res.json();
+
+                                    location.reload();
+                                });
+                                li.appendChild(btnModify);
+
+                                const btnDelete = document.createElement("button");
+                                btnDelete.textContent = "Usuń";
+                                btnDelete.addEventListener("click", async e => {
+                                    e.preventDefault();
+                                    const id = item.id;
+                                    const activity = 'delete';
+
+                                    const res = await fetch(`/api/books/${id}/state/${activity}`, {
+                                        method: 'PATCH',
+                                    });
+
+                                    const data = await res.json();
+
+                                    location.reload();
+                                });
+                                li.appendChild(btnDelete);
+                            }
+
+                            if(item.state === 'reserved') {
+                                const btn = document.createElement("button");
+                                btn.textContent = "Anuluj";
+                                btn.addEventListener("click", async e => {
+                                    e.preventDefault();
+                                    const id = item.id;
+                                    const activity = 'cancel';
+
+                                    const res = await fetch(`/api/books/${id}/state/${activity}`, {
+                                        method: 'PATCH',
+                                    });
+
+                                    const data = await res.json();
+
+                                    location.reload();
+                                });
+                                li.appendChild(btn);
+                            }
+
+                            ulBooksInLibrary.appendChild(li);
+                        });
+                    }
+                }
+            }
+        }
+
         const cookies = getObjectOfCookies();
         const h1 = document.createElement("h1");
 
@@ -185,11 +410,13 @@
             switch(cookies.role) {
                 case 'user':
                     getUserPanel(div);
-                    getUserBooks(cookies.visitor_id);
+                    getUserBooksForUserPanel(cookies.visitor_id);
 
                     break;
                 case 'admin':
-                    div.textContent = "Panel admina";
+                    getAdminPanel(div);
+                    getLibraryBooksForAdminPanel();
+
                     break;
                 default:
                     div.textContent = "Nie ma takiego panelu";
