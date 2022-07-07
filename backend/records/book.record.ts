@@ -6,6 +6,7 @@ export class BookRecord implements BookEntity {
     name_surname: string;
     title: string;
     state: string;
+    user_id?: string;
     return_until?: string;
 
     constructor(obj: BookEntity) {
@@ -13,12 +14,13 @@ export class BookRecord implements BookEntity {
         this.name_surname = obj.name_surname;
         this.title = obj.title;
         this.state = obj.state;
+        this.user_id = obj.user_id;
         this.return_until = obj.return_until;
     };
 
     static async find(id: string): Promise<BookRecord | null> {
         const [results]: any = await pool.execute(
-            "SELECT `books`.`id`, `name_surname`, `title`, `book_states`.`name` AS `state`, `return_until`" +
+            "SELECT `books`.`id`, `name_surname`, `title`, `book_states`.`name` AS `state`, `user_id`, `return_until`" +
             "FROM `books`, `book_authors`, `book_titles`, `book_states`" +
             "WHERE `books`.`author1_id` = `book_authors`.`id`" +
             "AND `books`.`title_id` = `book_titles`.`id`" +
@@ -56,7 +58,7 @@ export class BookRecord implements BookEntity {
         return results.length === 0 ? [] : results.map((item: any) => new BookRecord(item));
     };
 
-    async update(state: string, user_id: string = 'NULL'): Promise<void> {
+    async updateState(state: string, user_id: string = 'NULL'): Promise<void> {
         if(!this.id) {
             throw new Error('Book has no ID');
         }
