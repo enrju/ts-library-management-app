@@ -54,7 +54,7 @@ apiBooksRouter.patch('/books/:id/state/:activity', (req: Request, res: Response)
                     (async () => {
                         const book = await BookRecord.find(id);
 
-                        await book.update('available');
+                        await book.updateState('available');
 
                         res.json({updated: true});
                     })();
@@ -65,7 +65,35 @@ apiBooksRouter.patch('/books/:id/state/:activity', (req: Request, res: Response)
                     (async () => {
                         const book = await BookRecord.find(id);
 
-                        await book.update('reserved', req.cookies.visitor_id);
+                        await book.updateState('reserved', req.cookies.visitor_id);
+
+                        res.json({updated: true});
+                    })();
+
+                    break;
+                default:
+                    res.json({access: false});
+            }
+            break;
+        case 'admin':
+            switch(activity) {
+                case 'cancel':
+
+                    (async () => {
+                        const book = await BookRecord.find(id);
+
+                        await book.updateState('available');
+
+                        res.json({updated: true});
+                    })();
+
+                    break;
+                case 'rent':
+
+                    (async () => {
+                        const book = await BookRecord.find(id);
+
+                        await book.updateState('rented', book.user_id);
 
                         res.json({updated: true});
                     })();
