@@ -23,6 +23,34 @@ apiBooksRouter.get('/books', (req: Request, res: Response) => {
     }
 });
 
+apiBooksRouter.post('/books', (req: Request, res: Response) => {
+    const session_id = Cookies.getSessionId(req);
+
+    const userRole = createdSessions.getRole(session_id);
+
+    if(userRole === 'admin') {
+        console.log(req.body);
+        const author: string = req.body.author;
+        const title: string = req.body.title;
+
+        (async () => {
+            const newBook = new BookRecord({
+                name_surname: author,
+                title: title,
+                state: 'available',
+            });
+
+            const book_id = await newBook.insert();
+
+            console.log(book_id);
+
+        })();
+
+
+
+    }
+});
+
 apiBooksRouter.get('/books/:page/:per_page', (req: Request, res: Response) => {
     const session_id = Cookies.getSessionId(req);
 
