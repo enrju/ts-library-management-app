@@ -301,6 +301,39 @@
             }
         }
 
+        const getAddBookForm = async (div) => {
+            const res = await fetch('/add-book-form.html', {
+                method: 'GET',
+            });
+
+            const data = await res.text();
+
+            div.innerHTML = data;
+
+            const formAddBook = document.querySelector(".add-book-form");
+            formAddBook.addEventListener("submit", async e => {
+                // e.preventDefault();
+
+                const author = e.target.elements['author'].value;
+                const title = e.target.elements['title'].value;
+
+                const res = await fetch(`/api/books`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        author,
+                        title,
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await res.json();
+
+                console.log(data);
+            });
+        }
+
         const getLibraryBooksForAdminPanel = async () => {
             // --- all books ---
             const resAllBooks = await fetch(`/api/books`, {
@@ -310,8 +343,14 @@
             const dataAllBooks = await resAllBooks.json();
 
             const panel = document.querySelector(".panel");
+            const panelAddBook = document.querySelector(".panel-add-book");
+            const btnAddBook = document.querySelector(".btn-add-book");
+            btnAddBook.addEventListener("click", async () => {
+                await getAddBookForm(panelAddBook);
+            });
             const ulBooksInLibrary = document.querySelector(".books-in-library");
             ulBooksInLibrary.textContent = "";
+
 
             if(dataAllBooks.access === false) {
                 panel.textContent = "Brak dostępu, lub sesja wygasła"
