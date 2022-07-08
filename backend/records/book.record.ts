@@ -1,8 +1,11 @@
 import {BookEntity} from "./book.entity";
 import {pool} from "../utils/db";
+import {AuthorRecord} from "./author.record";
+import {TitleRecord} from "./title.record";
+import {BookStateRecord} from "./book-state.record";
 
 export class BookRecord implements BookEntity {
-    id: number;
+    id?: number;
     name_surname: string;
     title: string;
     state: string;
@@ -10,13 +13,61 @@ export class BookRecord implements BookEntity {
     return_until?: string;
 
     constructor(obj: BookEntity) {
-        this.id = obj.id;
+        if(obj.id) this.id = obj.id;
         this.name_surname = obj.name_surname;
         this.title = obj.title;
         this.state = obj.state;
         this.user_id = obj.user_id;
         this.return_until = obj.return_until;
     };
+
+    async insert(): Promise<number> {
+        //1. Czy autor jest w DB book_authors
+        let author_id = await AuthorRecord.findID(this.name_surname);
+
+        if(author_id === null) {
+            //- nie -> dodać do DB book_authors i zwrócić id
+            const newAuthor = new AuthorRecord({
+                name_surname: this.name_surname,
+            } as AuthorRecord);
+
+            author_id = await newAuthor.insert();
+        }
+
+        //2. Czy title jest w DB book_titles
+        let title_id = await TitleRecord.findID(this.title);
+
+        if(title_id === null) {
+            //- nie -> dodać do DB book_titles
+            const newTitle = new TitleRecord({
+                title: this.title,
+            } as TitleRecord);
+
+            title_id = await newTitle.insert();
+        }
+
+        //3. Znajdź state_id (DB tylko do odczytu)
+        let state_id = await BookStateRecord.findID(this.state);
+
+        if(state_id === null) {
+            state_id = 1;
+        }
+
+        //4. Tych samych książek może być wiele
+        //5. dodać do DB books nową książkę użyć id(author) i id(title)
+
+        //id AUTOINCREMENT
+        const [results]: any = await pool.execute(
+            "INSERT INTO `books`" +
+            " VALUES(NULL, :author_id, NULL, NULL, :title_id, :state_id, NULL, NULL)", {
+                author_id,
+                title_id,
+                state_id,
+            }
+        );
+
+        return results.insertId;
+    }
 
     static async find(id: string): Promise<BookRecord | null> {
         const [results]: any = await pool.execute(
