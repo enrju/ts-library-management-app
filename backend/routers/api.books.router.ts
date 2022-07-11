@@ -172,3 +172,24 @@ apiBooksRouter.patch('/books/:id/state/:activity', (req: Request, res: Response)
             res.json({access: false});
     }
 });
+
+apiBooksRouter.delete('/books/:id', (req:Request, res: Response) => {
+    const session_id = Cookies.getSessionId(req);
+
+    const userRole = createdSessions.getRole(session_id);
+
+    if(userRole === 'admin') {
+        const id = req.params.id;
+
+        (async () => {
+            const book = await BookRecord.find(id);
+
+            await book.delete();
+
+            res.json({deleted: true});
+        })();
+
+    } else {
+        res.json({access: false});
+    }
+});
