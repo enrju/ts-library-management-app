@@ -180,5 +180,63 @@ export class BookRecord implements BookEntity {
         if(title !== editedTitle.title) {
             await editedTitle.update(title);
         }
+    };
+
+    static async countAuthor(author_id: number): Promise<number> {
+        const [results]: any = await pool.execute(
+            "SELECT COUNT(*) " +
+            "FROM `books` " +
+            "WHERE `author1_id` = :author_id", {
+                author_id,
+            }
+        );
+
+        const result = results[0];
+
+        return result['COUNT(*)'];
     }
+
+    static async countTitle(title_id: number): Promise<number> {
+        const [results]: any = await pool.execute(
+            "SELECT COUNT(*) " +
+            "FROM `books` " +
+            "WHERE `title_id` = :title_id", {
+                title_id,
+            }
+        );
+
+        const result = results[0];
+
+        return result['COUNT(*)'];
+    }
+
+    async delete(): Promise<void> {
+        if(!this.id) {
+            throw new Error('Book has no ID');
+        }
+
+        const author_id = await AuthorRecord.findID(this.name_surname);
+        const title_id = await TitleRecord.findID(this.title);
+
+        const authorInBooks = await BookRecord.countAuthor(author_id);
+        const titleInBooks = await BookRecord.countTitle(title_id);
+
+        await pool.execute(
+            "DELETE FROM `books` WHERE `id` = :id", {
+                id: this.id,
+            }
+        );
+
+        if(authorInBooks === 1) {
+            //delete author if is used only in this book
+            const deletedAuthor = await AuthorRecord.find(author_id);
+            await deletedAuthor.delete();
+        }
+
+        if(titleInBooks === 1) {
+            //delete title if is used only in this book
+            const deletedTitle = await TitleRecord.find(title_id);
+            await deletedTitle.delete();
+        }
+    };
 };
