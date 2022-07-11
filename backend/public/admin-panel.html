@@ -20,26 +20,41 @@
         list-style: none;
     }
 
+    .panel-add-book,
+    .panel .search-user,
     .panel .search-book {
         text-align: center;
     }
 </style>
 <div class="panel">
-    <h1>PANEL UŻYTKOWNIKA</h1>
+    <h1>PANEL ADMINA</h1>
     <div>
-        <h2>ZAREZERWOWANE KSIĄŻKI</h2>
-        <ul class="user-books-reserved"></ul>
+        <form class="search-user">
+            <label>wpisz login użytkownika: <input type="text" name="user-login"></label>
+            <button type="submit">Szukaj</button>
+        </form>
+        <div>
+            <h2>ZAREZERWOWANE KSIĄŻKI</h2>
+            <ul class="user-books-reserved"></ul>
+        </div>
+        <div>
+            <h2>WYPOŻYCZONE KSIĄŻKI</h2>
+            <ul class="user-books-rented"></ul>
+        </div>
     </div>
-    <div>
-        <h2>WYPOŻYCZONE KSIĄŻKI</h2>
-        <ul class="user-books-rented"></ul>
-    </div>
+
     <div>
         <h2>KSIĄŻKI W BIBLIOTECE</h2>
+
         <div class="search-book">
             <label>wpisz tytuł lub autora: <input type="text"></label>
             <button>Szukaj</button>
         </div>
+
+        <div class="panel-add-book">
+            <button class="btn-add-book">Dodaj nową książkę</button>
+        </div>
+
         <ul class="books-in-library"></ul>
     </div>
 </div>
