@@ -20,6 +20,16 @@ export class TitleRecord {
         return results.length > 0 ? new TitleRecord(results[0]).id : null;
     }
 
+    static async find(id: number): Promise<TitleRecord | null> {
+        const [results]: any = await pool.execute(
+            "SELECT * FROM `book_titles` WHERE `id` = :id", {
+                id,
+            }
+        );
+
+        return results.length > 0 ? new TitleRecord(results[0]) : null;
+    }
+
     async insert(): Promise<number> {
         //id AUTOINCREMENT
         const [results]: any = await pool.execute(
@@ -29,5 +39,16 @@ export class TitleRecord {
         );
 
         return results.insertId;
+    }
+
+    async update(title: string): Promise<void> {
+        await pool.execute(
+            "UPDATE `book_titles` SET " +
+            "`title` = :title " +
+            "WHERE `id` = :id", {
+                title,
+                id: this.id,
+            }
+        );
     }
 }
