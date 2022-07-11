@@ -51,4 +51,16 @@ export class TitleRecord {
             }
         );
     }
+
+    async delete(): Promise<void> {
+        if(!this.id) {
+            throw new Error('Title has no ID');
+        }
+
+        await pool.execute(
+            "DELETE FROM `book_titles` WHERE `id` = :id", {
+                id: this.id,
+            }
+        );
+    }
 }
