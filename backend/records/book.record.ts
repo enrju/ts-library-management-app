@@ -161,4 +161,24 @@ export class BookRecord implements BookEntity {
                 });
         }
     };
+
+    async update(author: string, title: string): Promise<void> {
+        if(!this.id) {
+            throw new Error('Book has no ID');
+        }
+
+        //update autora
+        const author_id = await AuthorRecord.findID(this.name_surname);
+        const editedAuthor = await AuthorRecord.find(author_id);
+        if(author !== editedAuthor.name_surname) {
+            await editedAuthor.update(author);
+        }
+
+        //update tytułu
+        const title_id = await TitleRecord.findID(this.title);
+        const editedTitle = await TitleRecord.find(title_id);
+        if(title !== editedTitle.title) {
+            await editedTitle.update(title);
+        }
+    }
 };
