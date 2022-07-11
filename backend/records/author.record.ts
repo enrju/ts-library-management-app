@@ -51,4 +51,16 @@ export class AuthorRecord {
             }
         );
     }
+
+    async delete(): Promise<void> {
+        if(!this.id) {
+            throw new Error('Author has no ID');
+        }
+
+        await pool.execute(
+            "DELETE FROM `book_authors` WHERE `id` = :id", {
+                id: this.id,
+            }
+        );
+    }
 }
