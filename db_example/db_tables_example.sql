@@ -26,7 +26,7 @@ CREATE TABLE `book_authors` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name_surname` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -35,10 +35,10 @@ CREATE TABLE `book_authors` (
 
 LOCK TABLES `book_authors` WRITE;
 /*!40000 ALTER TABLE `book_authors` DISABLE KEYS */;
-INSERT INTO `book_authors` VALUES (1,'author-1');
-INSERT INTO `book_authors` VALUES (2,'author-2');
-INSERT INTO `book_authors` VALUES (3,'author-3');
-INSERT INTO `book_authors` VALUES (4,'author-4');
+INSERT INTO `book_authors` VALUES (1,'Adam Mickiewicz');
+INSERT INTO `book_authors` VALUES (2,'Bolesław Prus');
+INSERT INTO `book_authors` VALUES (3,'Stanisław Wyspiański');
+INSERT INTO `book_authors` VALUES (4,'J.K. Rowling');
 /*!40000 ALTER TABLE `book_authors` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -79,7 +79,7 @@ CREATE TABLE `book_titles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -88,10 +88,12 @@ CREATE TABLE `book_titles` (
 
 LOCK TABLES `book_titles` WRITE;
 /*!40000 ALTER TABLE `book_titles` DISABLE KEYS */;
-INSERT INTO `book_titles` VALUES (1,'title-1');
-INSERT INTO `book_titles` VALUES (2,'title-2');
-INSERT INTO `book_titles` VALUES (3,'title-3');
-INSERT INTO `book_titles` VALUES (4,'title-4');
+INSERT INTO `book_titles` VALUES (1,'Dziady');
+INSERT INTO `book_titles` VALUES (2,'Pan Tadeusz');
+INSERT INTO `book_titles` VALUES (3,'Lalka');
+INSERT INTO `book_titles` VALUES (4,'Wesele');
+INSERT INTO `book_titles` VALUES (5,'Harry Potter i kamień filozoficzny');
+INSERT INTO `book_titles` VALUES (6,'Harry Potter i komnata tajemnic');
 /*!40000 ALTER TABLE `book_titles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -124,7 +126,7 @@ CREATE TABLE `books` (
   CONSTRAINT `books_ibfk_4` FOREIGN KEY (`author2_id`) REFERENCES `book_authors` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `books_ibfk_5` FOREIGN KEY (`author3_id`) REFERENCES `book_authors` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `books_ibfk_6` FOREIGN KEY (`title_id`) REFERENCES `book_titles` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -134,13 +136,13 @@ CREATE TABLE `books` (
 LOCK TABLES `books` WRITE;
 /*!40000 ALTER TABLE `books` DISABLE KEYS */;
 INSERT INTO `books` VALUES (1,1,NULL,NULL,1,1,NULL,NULL);
-INSERT INTO `books` VALUES (2,1,NULL,NULL,1,1,NULL,NULL);
-INSERT INTO `books` VALUES (3,1,NULL,NULL,1,1,NULL,NULL);
-INSERT INTO `books` VALUES (4,2,NULL,NULL,2,1,NULL,NULL);
-INSERT INTO `books` VALUES (5,2,NULL,NULL,2,1,NULL,NULL);
-INSERT INTO `books` VALUES (6,3,NULL,NULL,3,1,NULL,NULL);
-INSERT INTO `books` VALUES (7,4,NULL,NULL,4,1,NULL,NULL);
-INSERT INTO `books` VALUES (8,4,NULL,NULL,4,1,NULL,NULL);
+INSERT INTO `books` VALUES (2,1,NULL,NULL,1,2,'def','2022-07-07');
+INSERT INTO `books` VALUES (3,1,NULL,NULL,2,1,NULL,NULL);
+INSERT INTO `books` VALUES (4,2,NULL,NULL,3,1,NULL,NULL);
+INSERT INTO `books` VALUES (5,2,NULL,NULL,3,3,'def','2022-07-20');
+INSERT INTO `books` VALUES (6,3,NULL,NULL,4,1,NULL,NULL);
+INSERT INTO `books` VALUES (7,4,NULL,NULL,5,1,NULL,NULL);
+INSERT INTO `books` VALUES (8,4,NULL,NULL,6,3,'abc','2022-07-20');
 /*!40000 ALTER TABLE `books` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -196,7 +198,7 @@ LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 INSERT INTO `users` VALUES ('abc','tester-1','tester-1',1);
 INSERT INTO `users` VALUES ('def','tester-2','tester-2',1);
-INSERT INTO `users` VALUES ('ghi','tester-3','tester-3',2);
+INSERT INTO `users` VALUES ('ghi','tester-admin','tester-admin',2);
 INSERT INTO `users` VALUES ('jkl','tester-4','tester-4',1);
 INSERT INTO `users` VALUES ('mno','tester-5','tester-5',1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
@@ -211,4 +213,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-07-04  9:48:32
+-- Dump completed on 2022-07-11 13:26:42
