@@ -441,10 +441,10 @@
                                 btnDelete.addEventListener("click", async e => {
                                     e.preventDefault();
                                     const id = item.id;
-                                    const activity = 'delete';
+                                    // const activity = 'delete';
 
-                                    const res = await fetch(`/api/books/${id}/state/${activity}`, {
-                                        method: 'PATCH',
+                                    const res = await fetch(`/api/books/${id}`, {
+                                        method: 'DELETE',
                                     });
 
                                     const data = await res.json();
