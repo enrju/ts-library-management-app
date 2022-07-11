@@ -20,6 +20,16 @@ export class AuthorRecord {
         return results.length > 0 ? new AuthorRecord(results[0]).id : null;
     }
 
+    static async find(id: number): Promise<AuthorRecord | null> {
+        const [results]: any = await pool.execute(
+            "SELECT * FROM `book_authors` WHERE `id` = :id", {
+                id,
+            }
+        );
+
+        return results.length > 0 ? new AuthorRecord(results[0]) : null;
+    }
+
     async insert(): Promise<number> {
         //id AUTOINCREMENT
         const [results]: any = await pool.execute(
@@ -29,5 +39,16 @@ export class AuthorRecord {
         );
 
         return results.insertId;
+    }
+
+    async update(author: string): Promise<void> {
+        await pool.execute(
+            "UPDATE `book_authors` SET " +
+            "`name_surname` = :name_surname " +
+            "WHERE `id` = :id", {
+                name_surname: author,
+                id: this.id,
+            }
+        );
     }
 }
