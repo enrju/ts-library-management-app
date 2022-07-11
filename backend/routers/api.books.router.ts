@@ -23,6 +23,24 @@ apiBooksRouter.get('/books', (req: Request, res: Response) => {
     }
 });
 
+apiBooksRouter.get('/books/:id', (req: Request, res: Response) => {
+    const session_id = Cookies.getSessionId(req);
+
+    const userRole = createdSessions.getRole(session_id);
+
+    const book_id = req.params.id;
+
+    if(userRole === 'admin') {
+        (async () => {
+            const oneBook = await BookRecord.find(book_id);
+
+            res.json(oneBook);
+        })();
+    } else {
+        res.json({access: false});
+    }
+});
+
 apiBooksRouter.get('/books/:page/:per_page', (req: Request, res: Response) => {
     const session_id = Cookies.getSessionId(req);
 
