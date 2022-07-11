@@ -23,13 +23,26 @@ apiBooksRouter.get('/books', (req: Request, res: Response) => {
     }
 });
 
+apiBooksRouter.get('/books/:page/:per_page', (req: Request, res: Response) => {
+    const session_id = Cookies.getSessionId(req);
+
+    const userRole = createdSessions.getRole(session_id);
+
+    if(userRole) {
+
+        res.redirect('/api/books');
+
+    } else {
+        res.json({access: false});
+    }
+});
+
 apiBooksRouter.post('/books', (req: Request, res: Response) => {
     const session_id = Cookies.getSessionId(req);
 
     const userRole = createdSessions.getRole(session_id);
 
     if(userRole === 'admin') {
-        console.log(req.body);
         const author: string = req.body.author;
         const title: string = req.body.title;
 
@@ -42,24 +55,30 @@ apiBooksRouter.post('/books', (req: Request, res: Response) => {
 
             const book_id = await newBook.insert();
 
-            console.log(book_id);
-
+            res.json({insertedId: book_id});
         })();
-
-
-
+    } else {
+        res.json({access: false});
     }
 });
 
-apiBooksRouter.get('/books/:page/:per_page', (req: Request, res: Response) => {
+apiBooksRouter.patch('/books/:id', (req:Request, res: Response) => {
     const session_id = Cookies.getSessionId(req);
 
     const userRole = createdSessions.getRole(session_id);
 
-    if(userRole) {
+    if(userRole === 'admin') {
+        const id = req.params.id;
+        const author: string = req.body.author;
+        const title: string = req.body.title;
 
-        res.redirect('/api/books');
+        (async () => {
+            const book = await BookRecord.find(id);
 
+            await book.update(author, title);
+
+            res.json({updated: true});
+        })();
     } else {
         res.json({access: false});
     }
