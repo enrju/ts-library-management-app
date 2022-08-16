@@ -2,6 +2,7 @@ import { Body, Controller, Inject, Post, Res } from "@nestjs/common";
 import {Response} from 'express';
 import { AuthService } from "./auth.service";
 import { LoginAuthDto } from "./dto/login-auth.dto";
+import { LoginAuthResponse } from "../types";
 
 @Controller('/auth')
 export class AuthController {
@@ -14,7 +15,7 @@ export class AuthController {
     login(
         @Body() loginAuthDto: LoginAuthDto,
         @Res() res: Response,
-    ): Promise<any> {
+    ): Promise<LoginAuthResponse> {
         return this.authService.login(loginAuthDto, res);
     }
 }

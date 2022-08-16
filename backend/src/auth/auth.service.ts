@@ -7,6 +7,7 @@ import { JwtPayload } from "./jwt.strategy";
 import { sign } from "jsonwebtoken";
 import { authConfig } from "../../config/auth-config";
 import {v4 as uuid} from 'uuid';
+import { LoginAuthResponse } from "../types";
 
 @Injectable()
 export class AuthService {
