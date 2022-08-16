@@ -40,15 +40,6 @@
             return JSON.parse(str);
         }
 
-        const getRegisterForm = async (div) => {
-            const res = await fetch('/register-form.html', {
-                method: 'GET',
-            });
-
-            const data = await res.text();
-
-            div.innerHTML = data;
-        }
         const setHandleRegisterForm = async () => {
             const registerForm = await document.querySelector(".register-form");
             registerForm.addEventListener("submit", async e => {
@@ -69,18 +60,90 @@
                 const data = await res.json();
                 console.log(data);
             });
+
+            const goToHomeBtn = document.querySelector(".go-to-home");
+            goToHomeBtn.addEventListener("click", e => {
+                e.preventDefault();
+
+                document.cookie = "isRegisterForm=false";
+                document.location.href = "/";
+            });
         }
+        const getRegisterForm = async (div) => {
+            const res = await fetch('/register-form.html', {
+                method: 'GET',
+            });
+
+            const data = await res.text();
+
+            div.innerHTML = data;
+
+            document.body.appendChild(div);
+            await setHandleRegisterForm();
+        }
+
+        const setHandleLoginForm = async () => {
+            const loginForm = await document.querySelector(".login-form");
+            loginForm.addEventListener("submit", async e => {
+                e.preventDefault();
+
+                const res = await fetch('http://localhost:3001/auth/login', {
+                    method: 'POST',
+                    credentials: "include",
+                    body: JSON.stringify({
+                        email: e.target.elements['email'].value,
+                        password: e.target.elements['password'].value
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                console.log(data);
+                document.location.href = "/";
+            });
+
+            const goToRegisterBtn = document.querySelector(".go-to-register");
+            goToRegisterBtn.addEventListener("click", e => {
+                e.preventDefault();
+
+                document.cookie = "isRegisterForm=true";
+                document.location.href = "/";
+            });
+        }
+        const getLoginForm = async (div) => {
+            const res = await fetch('/login-form.html', {
+                method: 'GET',
+            });
+
+            const data = await res.text();
+
+            div.innerHTML = data;
+
+            document.body.appendChild(div);
+            await setHandleLoginForm();
+        }
+
 
         (async () => {
             const cookies = getObjectOfCookies();
+            console.log(cookies);
             const div = document.createElement("div");
 
             if(cookies.logged) {
+                if(cookies.role === 'user') {
+                    document.body.innerHTML = "<h1>Panel usera</h1>";
+                } else if(cookies.role === 'admin') {
+                    document.body.innerHTML = "<h1>Panel admina</h1>";
+                }
 
             } else {
-                await getRegisterForm(div);
-                document.body.appendChild(div);
-                await setHandleRegisterForm();
+                if(cookies.isRegisterForm === 'false'
+                    || !cookies.isRegisterForm) {
+                    await getLoginForm(div);
+                } else if(cookies.isRegisterForm === 'true') {
+                    await getRegisterForm(div);
+                }
             }
         })();
     </script>

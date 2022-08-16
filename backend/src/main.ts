@@ -10,6 +10,7 @@ async function bootstrap() {
 
   (app as NestExpressApplication).use(cors({
     origin: appConfig.corsOrigin,
+    credentials: true,
   }));
   (app as NestExpressApplication).use(cookieParser());
 
