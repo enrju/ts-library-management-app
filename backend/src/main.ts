@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { appConfig } from "../config/app-config";
 import {NestExpressApplication} from "@nestjs/platform-express";
 const cors = require('cors');
+import * as cookieParser from "cookie-parser";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,6 +11,7 @@ async function bootstrap() {
   (app as NestExpressApplication).use(cors({
     origin: appConfig.corsOrigin,
   }));
+  (app as NestExpressApplication).use(cookieParser());
 
   await app.listen(appConfig.listenPort, () => {
     console.log('Server is working ...');
