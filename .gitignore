@@ -6,6 +6,7 @@
 /backend/node_modules
 /backend/config/app-config.ts
 /backend/config/orm-config.ts
+/backend/config/auth-config.ts
 
 # --- TMP-FRONT (test HTML) ---
 /tmp_front_test_html/dist
