@@ -84,4 +84,29 @@ export class AuthService {
             });
         }
     }
+
+    async logout(user: UserEntity, res: Response): Promise<any> {
+        try {
+            user.currentTokenId = null;
+            await user.save();
+
+            res
+                .clearCookie('jwt', {
+                    secure: false,
+                    domain: authConfig.jwtCookieDomain,
+                    httpOnly: true,
+                })
+                .clearCookie('logged')
+                .clearCookie('role')
+
+            return res.json({
+                isSuccess: true,
+            });
+        } catch(e) {
+            return res.json({
+                isSuccess: false,
+                msgError: e.message
+            });
+        }
+    }
 }
