@@ -7,7 +7,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { UserEntity } from "../user/entities/user.entity";
 import { UserObj } from "../decorators/user-obj.decorator";
 
-@Controller('/auth')
+@Controller('/api/v1/auth')
 export class AuthController {
     constructor(
         @Inject(AuthService) private authService: AuthService,
