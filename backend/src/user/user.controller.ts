@@ -3,7 +3,7 @@ import { RegisterUserDto } from "./dto/register-user.dto";
 import { RegisterUserResponse } from "../types";
 import { UserService } from "./user.service";
 
-@Controller('/user')
+@Controller('/api/v1/users')
 export class UserController {
     constructor(
         @Inject(UserService) private userService: UserService,
