@@ -124,19 +124,48 @@
             await setHandleLoginForm();
         }
 
+        const setHandleLogoutBtn = async () => {
+            const logoutBtn = document.querySelector(".logout-btn");
+            logoutBtn.addEventListener("click", async e => {
+                e.preventDefault();
+
+                const res = await fetch('http://localhost:3001/auth/logout', {
+                    method: 'GET',
+                    credentials: "include",
+                });
+                const data = await res.json();
+                console.log(data);
+
+                document.location.href = "/";
+            });
+        }
+        const getLogoutBtn = async (div) => {
+            const res = await fetch('/logout-btn.html', {
+                method: 'GET',
+            });
+
+            const data = await res.text();
+
+            div.innerHTML = data;
+
+            document.body.appendChild(div);
+            await setHandleLogoutBtn();
+        }
+
 
         (async () => {
             const cookies = getObjectOfCookies();
-            console.log(cookies);
             const div = document.createElement("div");
 
             if(cookies.logged) {
-                if(cookies.role === 'user') {
-                    document.body.innerHTML = "<h1>Panel usera</h1>";
-                } else if(cookies.role === 'admin') {
-                    document.body.innerHTML = "<h1>Panel admina</h1>";
+                switch(cookies.role) {
+                    case 'user':
+                        await getLogoutBtn(div);
+                        break;
+                    case 'admin':
+                        await getLogoutBtn(div);
+                        break;
                 }
-
             } else {
                 if(cookies.isRegisterForm === 'false'
                     || !cookies.isRegisterForm) {
