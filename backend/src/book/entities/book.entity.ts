@@ -3,12 +3,10 @@ import {
     Column,
     Entity,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn
 } from "typeorm";
 import { TitleEntity } from "./title.entity";
 import { UserEntity } from "../../user/entities/user.entity";
-import { BookAuthorEntity } from "./book-author.entity";
 import { BookState } from "../../types";
 
 @Entity()
@@ -40,9 +38,9 @@ export class BookEntity extends BaseEntity {
     )
     userEntity: UserEntity;
 
-    @OneToMany(
-        type => BookAuthorEntity,
-        entity => entity.bookEntity,
-    )
-    bookAuthorEntity: BookAuthorEntity[];
+    // @OneToMany(
+    //     type => BookAuthorEntity,
+    //     entity => entity.bookEntity,
+    // )
+    // bookAuthorEntity: BookAuthorEntity[];
 }

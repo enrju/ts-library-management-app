@@ -4,19 +4,19 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
-import { BookEntity } from "./book.entity";
 import { AuthorEntity } from "./author.entity";
+import { TitleEntity } from "./title.entity";
 
 @Entity()
-export class BookAuthorEntity extends BaseEntity {
+export class TitleAuthorEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
     @ManyToOne(
-        type => BookEntity,
+        type => TitleEntity,
         entity => entity.id
     )
-    bookEntity: BookEntity;
+    titleEntity: TitleEntity;
 
     @ManyToOne(
         type => AuthorEntity,

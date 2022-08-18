@@ -6,6 +6,7 @@ import {
     PrimaryGeneratedColumn
 } from "typeorm";
 import { BookEntity } from "./book.entity";
+import { TitleAuthorEntity } from "./title-author.entity";
 
 @Entity()
 export class TitleEntity extends BaseEntity {
@@ -22,4 +23,10 @@ export class TitleEntity extends BaseEntity {
         entity => entity.titleEntity,
     )
     bookEntity: BookEntity[];
+
+    @OneToMany(
+        type => TitleAuthorEntity,
+        entity => entity.titleEntity,
+    )
+    titleAuthorEntity: TitleAuthorEntity[];
 }
