@@ -2,8 +2,10 @@ import {
     BaseEntity,
     Column,
     Entity,
+    OneToMany,
     PrimaryGeneratedColumn
 } from "typeorm";
+import { BookEntity } from "../../book/entities/book.entity";
 
 @Entity()
 export class UserEntity extends BaseEntity {
@@ -35,8 +37,14 @@ export class UserEntity extends BaseEntity {
     currentTokenId: string | null;
 
     @Column({
-        length: 10,
         default: 'user',
+        length: 10,
     })
     role: 'admin' | 'user';
+
+    @OneToMany(
+        type => BookEntity,
+        entity => entity.userEntity,
+    )
+    bookEntity: BookEntity[];
 }
