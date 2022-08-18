@@ -35,6 +35,7 @@ export class UserEntity extends BaseEntity {
     currentTokenId: string | null;
 
     @Column({
+        length: 10,
         default: 'user',
     })
     role: 'admin' | 'user';
