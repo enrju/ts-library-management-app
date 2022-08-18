@@ -9,6 +9,7 @@ import {
 import { TitleEntity } from "./title.entity";
 import { UserEntity } from "../../user/entities/user.entity";
 import { BookAuthorEntity } from "./book-author.entity";
+import { BookState } from "../../types";
 
 @Entity()
 export class BookEntity extends BaseEntity {
@@ -16,10 +17,10 @@ export class BookEntity extends BaseEntity {
     id: number;
 
     @Column({
-        default: 'available',
+        default: BookState.Available,
         length: 10,
     })
-    state: 'available' | 'rented' | 'reserved';
+    state: BookState;
 
     @Column({
         default: null,

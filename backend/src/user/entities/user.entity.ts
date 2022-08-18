@@ -6,6 +6,7 @@ import {
     PrimaryGeneratedColumn
 } from "typeorm";
 import { BookEntity } from "../../book/entities/book.entity";
+import { UserRole } from "../../types";
 
 @Entity()
 export class UserEntity extends BaseEntity {
@@ -37,10 +38,10 @@ export class UserEntity extends BaseEntity {
     currentTokenId: string | null;
 
     @Column({
-        default: 'user',
+        default: UserRole.User,
         length: 10,
     })
-    role: 'admin' | 'user';
+    role: UserRole;
 
     @OneToMany(
         type => BookEntity,
