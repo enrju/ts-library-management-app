@@ -37,10 +37,4 @@ export class BookEntity extends BaseEntity {
         entity => entity.id,
     )
     userEntity: UserEntity;
-
-    // @OneToMany(
-    //     type => BookAuthorEntity,
-    //     entity => entity.bookEntity,
-    // )
-    // bookAuthorEntity: BookAuthorEntity[];
 }
