@@ -118,4 +118,29 @@ export class BookService {
         }
 
     }
+
+    async getUserBooks(userId: string): Promise<GetUserBooksRespons> {
+        try {
+            const userBooksFiltered =
+                (await this.getAllFullData())
+                .filter(item => item.userId === userId)
+                .map(item => ({
+                    id: item.id,
+                    title: item.title,
+                    author: item.author,
+                    state: item.state,
+                    returnUntil: item.returnUntil,
+                }));
+
+            return {
+                isSuccess: true,
+                data: userBooksFiltered,
+            };
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
+    }
 }
