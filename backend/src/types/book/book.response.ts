@@ -14,3 +14,15 @@ export type GetAllBooksRespons = {
     isSuccess: false;
     msgError: string;
 }
+
+export interface UserBook extends LibraryBook {
+    returnUntil: Date | null;
+}
+
+export type GetUserBooksRespons = {
+    isSuccess: true;
+    data: UserBook[];
+} | {
+    isSuccess: false;
+    msgError: string;
+}
