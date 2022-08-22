@@ -7,6 +7,10 @@ export interface LibraryBook {
     state: BookState;
 }
 
+export interface UserBook extends LibraryBook {
+    returnUntil: Date | null;
+}
+
 export type GetAllBooksRespons = {
     isSuccess: true;
     data: LibraryBook[];
@@ -15,13 +19,16 @@ export type GetAllBooksRespons = {
     msgError: string;
 }
 
-export interface UserBook extends LibraryBook {
-    returnUntil: Date | null;
-}
-
 export type GetUserBooksRespons = {
     isSuccess: true;
     data: UserBook[];
+} | {
+    isSuccess: false;
+    msgError: string;
+}
+
+export type UpdateBookStateRespons = {
+    isSuccess: true;
 } | {
     isSuccess: false;
     msgError: string;
