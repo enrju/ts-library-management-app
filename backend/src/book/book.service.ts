@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { BookEntity } from "./entities/book.entity";
 import { TitleEntity } from "./entities/title.entity";
 import { TitleAuthorEntity } from "./entities/title-author.entity";
-import { BookState, GetAllBooksRespons, GetUserBooksRespons } from "../types";
+import { BookState, GetAllBooksRespons, GetUserBooksRespons, UpdateBookStateRespons } from "../types";
+import { appConfig } from "../../config/app-config";
+import { UserEntity } from "../user/entities/user.entity";
 
 type AllBooksFullData = {
     id: number;
@@ -136,6 +138,90 @@ export class BookService {
                 isSuccess: true,
                 data: userBooksFiltered,
             };
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
+    }
+
+    private async changeState(bookId: number, bookState: BookState, userId: string | null = null): Promise<void> {
+        const book = await BookEntity.findOneOrFail({
+            where: {
+                id: bookId,
+            }
+        });
+
+        if(book) {
+            if(!userId) {
+                book.state = bookState;
+                book.return_until = null;
+                book.userEntity = null;
+
+                await book.save();
+
+            } else {
+                const user = await UserEntity.findOneOrFail({
+                    where: {
+                        id: userId,
+                    }
+                });
+
+                let validDate = null;
+                switch (bookState) {
+                    case BookState.Reserved:
+                        validDate = new Date(new Date().getTime() + appConfig.bookReservationPeriod);
+                        break;
+                    case BookState.Rented:
+                        validDate = new Date(new Date().getTime() + appConfig.bookRentPeriod);
+                        break;
+                }
+
+                book.state = bookState;
+                book.return_until = validDate;
+                book.userEntity = user ? user : null;
+
+                await book.save();
+
+            }
+        } else {
+            throw new Error("This book don't exist");
+        }
+    }
+
+    async userChangeState(bookId: number, bookState: BookState, userId: string | null = null): Promise<UpdateBookStateRespons> {
+        try {
+            switch (bookState) {
+                case BookState.Available:
+                    await this.changeState(bookId, bookState, null);
+
+                    return {
+                        isSuccess: true,
+                    };
+                case BookState.Reserved:
+                    await this.changeState(bookId, bookState, userId);
+
+                    return {
+                        isSuccess: true,
+                    };
+                default:
+                    return {
+                        isSuccess: false,
+                        msgError: 'Illegal action!',
+                    };
+            }
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
+    }
+
+    async adminChangeState(bookId: number, bookState: BookState): Promise<UpdateBookStateRespons> {
+        try {
+
         } catch(e) {
             return {
                 isSuccess: false,
