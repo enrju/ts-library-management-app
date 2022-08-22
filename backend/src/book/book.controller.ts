@@ -13,11 +13,11 @@ export class BookController {
     }
 
     @Get('/')
-    // @SetAccessForRoles(['user', 'admin'])
-    // @UseGuards(
-    //     AuthGuard('jwt'),
-    //     AccessForRolesProtectGuard
-    // )
+    @SetAccessForRoles(['user', 'admin'])
+    @UseGuards(
+        AuthGuard('jwt'),
+        AccessForRolesProtectGuard
+    )
     async getAll(): Promise<GetAllBooksRespons> {
         return this.bookService.getAll();
     }

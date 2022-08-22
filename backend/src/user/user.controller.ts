@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Inject, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, Post, UseGuards } from "@nestjs/common";
 import { RegisterUserDto } from "./dto/register-user.dto";
-import { RegisterUserResponse } from "../types";
+import { GetUserBooksRespons, RegisterUserResponse } from "../types";
 import { UserService } from "./user.service";
 import { SetAccessForRoles } from "../decorators/set-access-for-roles.decorator";
 import { AuthGuard } from "@nestjs/passport";
 import { AccessForRolesProtectGuard } from "../guards/access-for-roles-protect.guard";
+import { UserObj } from "../decorators/user-obj.decorator";
+import { UserEntity } from "./entities/user.entity";
 
 @Controller('/api/v1/users')
 export class UserController {
@@ -20,33 +22,27 @@ export class UserController {
         return await this.userService.register(registerUserDto);
     }
 
-    @Get('/test-user')
+    @Get('/id/books')
     @SetAccessForRoles(['user'])
     @UseGuards(
         AuthGuard('jwt'),
         AccessForRolesProtectGuard
     )
-    testUser() {
-        return 'test-user';
+    async getUserBooks(
+        @UserObj() user: UserEntity,
+    ): Promise<GetUserBooksRespons> {
+        return this.userService.getUserBooks(user.id);
     }
 
-    @Get('/test-admin')
+    @Get('/:id/books')
     @SetAccessForRoles(['admin'])
     @UseGuards(
         AuthGuard('jwt'),
         AccessForRolesProtectGuard
     )
-    testAdmin() {
-        return 'test-admin';
-    }
-
-    @Get('/test-user-admin')
-    @SetAccessForRoles(['user', 'admin'])
-    @UseGuards(
-        AuthGuard('jwt'),
-        AccessForRolesProtectGuard
-    )
-    testUserAdmin() {
-        return 'test-user-admin';
+    async adminGetUserBooks(
+        @Param('id') userId: string
+    ): Promise<GetUserBooksRespons> {
+        return this.userService.getUserBooks(userId);
     }
 }
