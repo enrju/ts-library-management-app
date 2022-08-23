@@ -74,6 +74,8 @@ export class AuthService {
                 })
                 .cookie('logged', true)
                 .cookie('role', user.role)
+                .cookie('name', user.name)
+                .cookie('surname', user.surname)
                 .json({
                     isSuccess: true,
                 });
@@ -98,6 +100,8 @@ export class AuthService {
                 })
                 .clearCookie('logged')
                 .clearCookie('role')
+                .clearCookie('name')
+                .clearCookie('surname')
 
             return res.json({
                 isSuccess: true,
