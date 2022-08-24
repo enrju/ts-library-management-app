@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { GetUserBooksRespons, RegisterUserResponse } from "../types";
+import { GetUserBooksRespons, GetUserIdByLoginResponse, RegisterUserResponse } from "../types";
 import { RegisterUserDto } from "./dto/register-user.dto";
 import { UserEntity } from "./entities/user.entity";
 import { hashText } from "../utils/hash";
@@ -32,5 +32,31 @@ export class UserService {
 
     async getUserBooks(userId: string): Promise<GetUserBooksRespons> {
         return this.bookService.getUserBooks(userId);
+    }
+
+    async getUserIdByLogin(userLogin: string): Promise<GetUserIdByLoginResponse> {
+        try {
+            const user = await UserEntity.findOneOrFail({
+                where: {
+                    email: userLogin,
+                }
+            });
+
+            if(user) {
+                return {
+                    isSuccess: true,
+                    data: {
+                        id: user.id,
+                    }
+                }
+            } else {
+                throw new Error("User for this login don't exist");
+            }
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
     }
 }

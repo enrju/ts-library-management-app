@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Inject, Param, Post, UseGuards } from "@nestjs/common";
 import { RegisterUserDto } from "./dto/register-user.dto";
-import { GetUserBooksRespons, RegisterUserResponse } from "../types";
+import { GetUserBooksRespons, GetUserIdByLoginResponse, RegisterUserResponse } from "../types";
 import { UserService } from "./user.service";
 import { SetAccessForRoles } from "../decorators/set-access-for-roles.decorator";
 import { AuthGuard } from "@nestjs/passport";
@@ -44,5 +44,17 @@ export class UserController {
         @Param('id') userId: string
     ): Promise<GetUserBooksRespons> {
         return this.userService.getUserBooks(userId);
+    }
+
+    @Get('/id/bylogin/:login')
+    @SetAccessForRoles(['admin'])
+    @UseGuards(
+        AuthGuard('jwt'),
+        AccessForRolesProtectGuard
+    )
+    async getUserIdByLogin(
+        @Param('login') userLogin: string,
+    ): Promise<GetUserIdByLoginResponse> {
+        return this.userService.getUserIdByLogin(userLogin);
     }
 }
