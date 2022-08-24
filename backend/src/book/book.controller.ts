@@ -3,7 +3,7 @@ import { BookService } from "./book.service";
 import { SetAccessForRoles } from "../decorators/set-access-for-roles.decorator";
 import { AuthGuard } from "@nestjs/passport";
 import { AccessForRolesProtectGuard } from "../guards/access-for-roles-protect.guard";
-import { BookState, GetAllBooksRespons, UpdateBookStateRespons, UserRole } from "../types";
+import { BookState, GetAllBooksResponse, UpdateBookStateResponse, UserRole } from "../types";
 import { UserObj } from "../decorators/user-obj.decorator";
 import { UserEntity } from "../user/entities/user.entity";
 
@@ -20,7 +20,7 @@ export class BookController {
         AuthGuard('jwt'),
         AccessForRolesProtectGuard
     )
-    async getAll(): Promise<GetAllBooksRespons> {
+    async getAll(): Promise<GetAllBooksResponse> {
         return this.bookService.getAll();
     }
 
@@ -34,7 +34,7 @@ export class BookController {
         @Param('id') bookId: string,
         @Param('state') bookState: BookState,
         @UserObj() user: UserEntity,
-    ): Promise<UpdateBookStateRespons> {
+    ): Promise<UpdateBookStateResponse> {
         switch(user.role) {
             case UserRole.User:
                 return this.bookService.userChangeState(Number(bookId), bookState, user.id);

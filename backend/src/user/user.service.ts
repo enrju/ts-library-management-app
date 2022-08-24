@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { GetUserBooksRespons, GetUserIdByLoginResponse, RegisterUserResponse } from "../types";
+import { GetUserBooksResponse, GetUserIdByLoginResponse, RegisterUserResponse } from "../types";
 import { RegisterUserDto } from "./dto/register-user.dto";
 import { UserEntity } from "./entities/user.entity";
 import { hashText } from "../utils/hash";
@@ -30,7 +30,7 @@ export class UserService {
         };
     }
 
-    async getUserBooks(userId: string): Promise<GetUserBooksRespons> {
+    async getUserBooks(userId: string): Promise<GetUserBooksResponse> {
         return this.bookService.getUserBooks(userId);
     }
 

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Inject, Param, Post, UseGuards } from "@nestjs/common";
 import { RegisterUserDto } from "./dto/register-user.dto";
-import { GetUserBooksRespons, GetUserIdByLoginResponse, RegisterUserResponse } from "../types";
+import { GetUserBooksResponse, GetUserIdByLoginResponse, RegisterUserResponse } from "../types";
 import { UserService } from "./user.service";
 import { SetAccessForRoles } from "../decorators/set-access-for-roles.decorator";
 import { AuthGuard } from "@nestjs/passport";
@@ -30,7 +30,7 @@ export class UserController {
     )
     async getUserBooks(
         @UserObj() user: UserEntity,
-    ): Promise<GetUserBooksRespons> {
+    ): Promise<GetUserBooksResponse> {
         return this.userService.getUserBooks(user.id);
     }
 
@@ -42,7 +42,7 @@ export class UserController {
     )
     async adminGetUserBooks(
         @Param('id') userId: string
-    ): Promise<GetUserBooksRespons> {
+    ): Promise<GetUserBooksResponse> {
         return this.userService.getUserBooks(userId);
     }
 
