@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BookEntity } from "./entities/book.entity";
 import { TitleEntity } from "./entities/title.entity";
 import { TitleAuthorEntity } from "./entities/title-author.entity";
-import { BookState, GetAllBooksRespons, GetUserBooksRespons, UpdateBookStateRespons } from "../types";
+import { BookState, GetAllBooksResponse, GetUserBooksResponse, UpdateBookStateResponse } from "../types";
 import { appConfig } from "../../config/app-config";
 import { UserEntity } from "../user/entities/user.entity";
 
@@ -97,7 +97,7 @@ export class BookService {
         return allBooks;
     }
 
-    async getAll(): Promise<GetAllBooksRespons> {
+    async getAll(): Promise<GetAllBooksResponse> {
         try {
             const allBooksFiltered =
                 (await this.getAllFullData())
@@ -121,7 +121,7 @@ export class BookService {
 
     }
 
-    async getUserBooks(userId: string): Promise<GetUserBooksRespons> {
+    async getUserBooks(userId: string): Promise<GetUserBooksResponse> {
         try {
             const userBooksFiltered =
                 (await this.getAllFullData())
@@ -190,7 +190,7 @@ export class BookService {
         }
     }
 
-    async userChangeState(bookId: number, bookState: BookState, userId: string | null = null): Promise<UpdateBookStateRespons> {
+    async userChangeState(bookId: number, bookState: BookState, userId: string | null = null): Promise<UpdateBookStateResponse> {
         try {
             switch (bookState) {
                 case BookState.Available:
@@ -219,7 +219,7 @@ export class BookService {
         }
     }
 
-    async adminChangeState(bookId: number, bookState: BookState): Promise<UpdateBookStateRespons> {
+    async adminChangeState(bookId: number, bookState: BookState): Promise<UpdateBookStateResponse> {
         try {
 
         } catch(e) {
