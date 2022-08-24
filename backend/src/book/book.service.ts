@@ -206,10 +206,7 @@ export class BookService {
                         isSuccess: true,
                     };
                 default:
-                    return {
-                        isSuccess: false,
-                        msgError: 'Illegal action!',
-                    };
+                    throw new Error('Illegal action!');
             }
         } catch(e) {
             return {
@@ -221,7 +218,33 @@ export class BookService {
 
     async adminChangeState(bookId: number, bookState: BookState): Promise<UpdateBookStateResponse> {
         try {
+            switch (bookState) {
+                case BookState.Available:
+                    await this.changeState(bookId, bookState, null);
 
+                    return {
+                        isSuccess: true,
+                    };
+                case BookState.Rented:
+                    const book = await BookEntity.findOneOrFail({
+                        relations: ['userEntity'],
+                        where: {
+                            id: bookId,
+                        }
+                    });
+
+                    if(book) {
+                        await this.changeState(bookId, bookState, book.userEntity.id);
+
+                        return {
+                            isSuccess: true,
+                        };
+                    } else {
+                        throw new Error('This book is not exist');
+                    }
+                default:
+                    throw new Error('Illegal action!');
+            }
         } catch(e) {
             return {
                 isSuccess: false,
