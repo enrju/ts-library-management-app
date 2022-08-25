@@ -6,6 +6,7 @@ import {
     BookState,
     CreateBookResponse,
     GetAllBooksResponse,
+    GetOneBookResponse,
     GetUserBooksResponse,
     UpdateBookStateResponse
 } from "../types";
@@ -326,6 +327,48 @@ export class BookService {
             return {
                 isSuccess: true,
             }
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
+    }
+
+    private async getOneFiltered(bookId: number): Promise<any> {
+        const book = await BookEntity.findOne({
+            relations: ['titleEntity'],
+            where: {
+                id: bookId,
+            }
+        });
+
+        const titleAuthor = await TitleAuthorEntity
+            .find({
+                relations: ['titleEntity', 'authorEntity'],
+                where: {
+                    titleEntity: book.titleEntity.valueOf()
+                }
+            });
+
+        return {
+            id: book.id,
+            title: book.titleEntity.title,
+            author: titleAuthor.map(item => ({
+                name: item.authorEntity.name,
+                surname: item.authorEntity.surname,
+            })),
+        };
+    }
+
+    async getOne(bookId: number): Promise<GetOneBookResponse> {
+        try {
+            const book = await this.getOneFiltered(bookId);
+
+            return {
+                isSuccess: true,
+                data: book,
+            };
         } catch(e) {
             return {
                 isSuccess: false,
