@@ -2,9 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { BookEntity } from "./entities/book.entity";
 import { TitleEntity } from "./entities/title.entity";
 import { TitleAuthorEntity } from "./entities/title-author.entity";
-import { BookState, GetAllBooksResponse, GetUserBooksResponse, UpdateBookStateResponse } from "../types";
+import {
+    BookState,
+    CreateBookResponse,
+    GetAllBooksResponse,
+    GetUserBooksResponse,
+    UpdateBookStateResponse
+} from "../types";
 import { appConfig } from "../../config/app-config";
 import { UserEntity } from "../user/entities/user.entity";
+import { CreateBookDto } from "./dto/create-book.dto";
+import { AuthorEntity } from "./entities/author.entity";
 
 type AllBooksFullData = {
     id: number;
@@ -244,6 +252,79 @@ export class BookService {
                     }
                 default:
                     throw new Error('Illegal action!');
+            }
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
+    }
+
+    async create(createBookDto: CreateBookDto): Promise<CreateBookResponse> {
+        try {
+            let titleEntity: TitleEntity = null;
+            let authorEntities: AuthorEntity[] = [];
+
+            const existingTitle = await TitleEntity.findOne({
+                where: {
+                    title: createBookDto.title,
+                }
+            });
+
+            if(!existingTitle) {
+                const title = new TitleEntity();
+                title.title = createBookDto.title;
+                await title.save();
+
+                titleEntity = title;
+            } else {
+                titleEntity = existingTitle;
+            }
+
+            for(let i = 0; i < createBookDto.author.length; i++) {
+                const existingAuthor = await AuthorEntity.findOne({
+                    where: {
+                        name: createBookDto.author[i].name,
+                        surname: createBookDto.author[i].surname,
+                    }
+                });
+
+                if(!existingAuthor) {
+                    const author = new AuthorEntity();
+                    author.name = createBookDto.author[i].name;
+                    author.surname = createBookDto.author[i].surname;
+                    await author.save();
+
+                    authorEntities.push(author);
+                } else {
+                    authorEntities.push(existingAuthor);
+                }
+            }
+
+            for(let i = 0; i < authorEntities.length; i++) {
+                const existingTitleAuthor = await TitleAuthorEntity.findOne({
+                    relations: ['titleEntity', 'authorEntity'],
+                    where: {
+                        titleEntity: titleEntity.valueOf(),
+                        authorEntity: authorEntities[i].valueOf(),
+                    }
+                });
+
+                if(!existingTitleAuthor) {
+                    const titleAuthor = new TitleAuthorEntity();
+                    titleAuthor.titleEntity = titleEntity;
+                    titleAuthor.authorEntity = authorEntities[i];
+                    await titleAuthor.save();
+                }
+            }
+
+            const newBook = new BookEntity();
+            newBook.titleEntity = titleEntity;
+            await newBook.save();
+
+            return {
+                isSuccess: true,
             }
         } catch(e) {
             return {
