@@ -33,3 +33,10 @@ export type UpdateBookStateResponse = {
     isSuccess: false;
     msgError: string;
 }
+
+export type CreateBookResponse = {
+    isSuccess: true;
+} | {
+    isSuccess: false;
+    msgError: string;
+}
