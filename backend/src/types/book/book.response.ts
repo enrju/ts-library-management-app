@@ -1,4 +1,11 @@
 import { BookState } from "./book.type";
+import { BookAuthor } from "./book.request";
+
+export interface Book {
+    id: number;
+    title: string;
+    author: BookAuthor[];
+}
 
 export interface LibraryBook {
     id: number;
@@ -22,6 +29,14 @@ export type GetAllBooksResponse = {
 export type GetUserBooksResponse = {
     isSuccess: true;
     data: UserBook[];
+} | {
+    isSuccess: false;
+    msgError: string;
+}
+
+export type GetOneBookResponse = {
+    isSuccess: true;
+    data: Book;
 } | {
     isSuccess: false;
     msgError: string;

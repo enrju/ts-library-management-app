@@ -12,7 +12,14 @@ import { BookService } from "./book.service";
 import { SetAccessForRoles } from "../decorators/set-access-for-roles.decorator";
 import { AuthGuard } from "@nestjs/passport";
 import { AccessForRolesProtectGuard } from "../guards/access-for-roles-protect.guard";
-import { BookState, CreateBookResponse, GetAllBooksResponse, UpdateBookStateResponse, UserRole } from "../types";
+import {
+    BookState,
+    CreateBookResponse,
+    GetAllBooksResponse,
+    GetOneBookResponse,
+    UpdateBookStateResponse,
+    UserRole
+} from "../types";
 import { UserObj } from "../decorators/user-obj.decorator";
 import { UserEntity } from "../user/entities/user.entity";
 import { CreateBookDto } from "./dto/create-book.dto";
@@ -63,5 +70,17 @@ export class BookController {
         @Body() createBookDto: CreateBookDto,
     ): Promise<CreateBookResponse> {
         return this.bookService.create(createBookDto);
+    }
+
+    @Get('/:id')
+    @SetAccessForRoles(['admin'])
+    @UseGuards(
+        AuthGuard('jwt'),
+        AccessForRolesProtectGuard
+    )
+    async getOne(
+        @Param('id') bookId: number
+    ): Promise<GetOneBookResponse> {
+        return this.bookService.getOne(bookId);
     }
 }
