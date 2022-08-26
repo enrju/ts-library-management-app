@@ -3,7 +3,7 @@ import { BookAuthor } from "./book.request";
 
 export interface Book {
     id: number;
-    title: string;
+    title: {id: number, title: string};
     author: BookAuthor[];
 }
 
@@ -50,6 +50,13 @@ export type UpdateBookStateResponse = {
 }
 
 export type CreateBookResponse = {
+    isSuccess: true;
+} | {
+    isSuccess: false;
+    msgError: string;
+}
+
+export type UpdateBookResponse = {
     isSuccess: true;
 } | {
     isSuccess: false;

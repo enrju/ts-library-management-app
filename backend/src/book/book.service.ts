@@ -7,13 +7,14 @@ import {
     CreateBookResponse,
     GetAllBooksResponse,
     GetOneBookResponse,
-    GetUserBooksResponse,
+    GetUserBooksResponse, UpdateBookResponse,
     UpdateBookStateResponse
 } from "../types";
 import { appConfig } from "../../config/app-config";
 import { UserEntity } from "../user/entities/user.entity";
 import { CreateBookDto } from "./dto/create-book.dto";
 import { AuthorEntity } from "./entities/author.entity";
+import { UpdateBookDto } from "./dto/update-book.dto";
 
 type AllBooksFullData = {
     id: number;
@@ -347,14 +348,18 @@ export class BookService {
             .find({
                 relations: ['titleEntity', 'authorEntity'],
                 where: {
-                    titleEntity: book.titleEntity.valueOf()
+                    titleEntity: book.titleEntity.valueOf(),
                 }
             });
 
         return {
             id: book.id,
-            title: book.titleEntity.title,
+            title: {
+                id: book.titleEntity.id,
+                title: book.titleEntity.title,
+            },
             author: titleAuthor.map(item => ({
+                id: item.authorEntity.id,
                 name: item.authorEntity.name,
                 surname: item.authorEntity.surname,
             })),
@@ -369,6 +374,40 @@ export class BookService {
                 isSuccess: true,
                 data: book,
             };
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
+    }
+
+    async update(bookId: number, updateBookDto: UpdateBookDto): Promise<UpdateBookResponse> {
+        try {
+            const titleEntity = await TitleEntity.findOne({
+                where: {
+                    id: updateBookDto.title.id,
+                }
+            });
+
+            titleEntity.title = updateBookDto.title.title;
+            await titleEntity.save();
+
+            for(let i = 0; i < updateBookDto.author.length; i++) {
+                const authorEntity = await AuthorEntity.findOne({
+                    where: {
+                        id: updateBookDto.author[i].id,
+                    }
+                });
+
+                authorEntity.name = updateBookDto.author[i].name;
+                authorEntity.surname = updateBookDto.author[i].surname;
+                await authorEntity.save();
+            }
+
+            return {
+                isSuccess: true,
+            }
         } catch(e) {
             return {
                 isSuccess: false,
