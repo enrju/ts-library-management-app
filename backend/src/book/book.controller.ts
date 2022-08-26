@@ -32,6 +32,18 @@ export class BookController {
     ) {
     }
 
+    @Post('/')
+    @SetAccessForRoles(['admin'])
+    @UseGuards(
+        AuthGuard('jwt'),
+        AccessForRolesProtectGuard
+    )
+    async create(
+        @Body() createBookDto: CreateBookDto,
+    ): Promise<CreateBookResponse> {
+        return this.bookService.create(createBookDto);
+    }
+
     @Get('/')
     @SetAccessForRoles(['user', 'admin'])
     @UseGuards(
@@ -40,6 +52,18 @@ export class BookController {
     )
     async getAll(): Promise<GetAllBooksResponse> {
         return this.bookService.getAll();
+    }
+
+    @Get('/:id')
+    @SetAccessForRoles(['admin'])
+    @UseGuards(
+        AuthGuard('jwt'),
+        AccessForRolesProtectGuard
+    )
+    async getOne(
+        @Param('id') bookId: number
+    ): Promise<GetOneBookResponse> {
+        return this.bookService.getOne(bookId);
     }
 
     @Patch('/:id/state/:state')
@@ -59,30 +83,6 @@ export class BookController {
             case UserRole.Admin:
                 return this.bookService.adminChangeState(Number(bookId), bookState);
         }
-    }
-
-    @Post('/')
-    @SetAccessForRoles(['admin'])
-    @UseGuards(
-        AuthGuard('jwt'),
-        AccessForRolesProtectGuard
-    )
-    async create(
-        @Body() createBookDto: CreateBookDto,
-    ): Promise<CreateBookResponse> {
-        return this.bookService.create(createBookDto);
-    }
-
-    @Get('/:id')
-    @SetAccessForRoles(['admin'])
-    @UseGuards(
-        AuthGuard('jwt'),
-        AccessForRolesProtectGuard
-    )
-    async getOne(
-        @Param('id') bookId: number
-    ): Promise<GetOneBookResponse> {
-        return this.bookService.getOne(bookId);
     }
 
     @Patch('/:id')
