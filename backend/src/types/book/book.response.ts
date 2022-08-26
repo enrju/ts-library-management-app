@@ -62,3 +62,10 @@ export type UpdateBookResponse = {
     isSuccess: false;
     msgError: string;
 }
+
+export type DeleteBookResponse = {
+    isSuccess: true;
+} | {
+    isSuccess: false;
+    msgError: string;
+}

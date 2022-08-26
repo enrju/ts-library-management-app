@@ -4,7 +4,7 @@ import { TitleEntity } from "./entities/title.entity";
 import { TitleAuthorEntity } from "./entities/title-author.entity";
 import {
     BookState,
-    CreateBookResponse,
+    CreateBookResponse, DeleteBookResponse,
     GetAllBooksResponse,
     GetOneBookResponse,
     GetUserBooksResponse, UpdateBookResponse,
@@ -27,6 +27,80 @@ type AllBooksFullData = {
 
 @Injectable()
 export class BookService {
+
+    async create(createBookDto: CreateBookDto): Promise<CreateBookResponse> {
+        try {
+            let titleEntity: TitleEntity = null;
+            let authorEntities: AuthorEntity[] = [];
+
+            const existingTitle = await TitleEntity.findOne({
+                where: {
+                    title: createBookDto.title,
+                }
+            });
+
+            if(!existingTitle) {
+                const title = new TitleEntity();
+                title.title = createBookDto.title;
+                await title.save();
+
+                titleEntity = title;
+            } else {
+                titleEntity = existingTitle;
+            }
+
+            for(let i = 0; i < createBookDto.author.length; i++) {
+                const existingAuthor = await AuthorEntity.findOne({
+                    where: {
+                        name: createBookDto.author[i].name,
+                        surname: createBookDto.author[i].surname,
+                    }
+                });
+
+                if(!existingAuthor) {
+                    const author = new AuthorEntity();
+                    author.name = createBookDto.author[i].name;
+                    author.surname = createBookDto.author[i].surname;
+                    await author.save();
+
+                    authorEntities.push(author);
+                } else {
+                    authorEntities.push(existingAuthor);
+                }
+            }
+
+            for(let i = 0; i < authorEntities.length; i++) {
+                const existingTitleAuthor = await TitleAuthorEntity.findOne({
+                    relations: ['titleEntity', 'authorEntity'],
+                    where: {
+                        titleEntity: titleEntity.valueOf(),
+                        authorEntity: authorEntities[i].valueOf(),
+                    }
+                });
+
+                if(!existingTitleAuthor) {
+                    const titleAuthor = new TitleAuthorEntity();
+                    titleAuthor.titleEntity = titleEntity;
+                    titleAuthor.authorEntity = authorEntities[i];
+                    await titleAuthor.save();
+                }
+            }
+
+            const newBook = new BookEntity();
+            newBook.titleEntity = titleEntity;
+            await newBook.save();
+
+            return {
+                isSuccess: true,
+            }
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
+    }
+
     private async getAllFullData(): Promise<AllBooksFullData> {
         const titleAuthor = (await TitleAuthorEntity
             .find({
@@ -156,6 +230,52 @@ export class BookService {
         }
     }
 
+    private async getOneFiltered(bookId: number): Promise<any> {
+        const book = await BookEntity.findOne({
+            relations: ['titleEntity'],
+            where: {
+                id: bookId,
+            }
+        });
+
+        const titleAuthor = await TitleAuthorEntity
+            .find({
+                relations: ['titleEntity', 'authorEntity'],
+                where: {
+                    titleEntity: book.titleEntity.valueOf(),
+                }
+            });
+
+        return {
+            id: book.id,
+            title: {
+                id: book.titleEntity.id,
+                title: book.titleEntity.title,
+            },
+            author: titleAuthor.map(item => ({
+                id: item.authorEntity.id,
+                name: item.authorEntity.name,
+                surname: item.authorEntity.surname,
+            })),
+        };
+    }
+
+    async getOne(bookId: number): Promise<GetOneBookResponse> {
+        try {
+            const book = await this.getOneFiltered(bookId);
+
+            return {
+                isSuccess: true,
+                data: book,
+            };
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
+    }
+
     private async changeState(bookId: number, bookState: BookState, userId: string | null = null): Promise<void> {
         const book = await BookEntity.findOneOrFail({
             where: {
@@ -263,125 +383,6 @@ export class BookService {
         }
     }
 
-    async create(createBookDto: CreateBookDto): Promise<CreateBookResponse> {
-        try {
-            let titleEntity: TitleEntity = null;
-            let authorEntities: AuthorEntity[] = [];
-
-            const existingTitle = await TitleEntity.findOne({
-                where: {
-                    title: createBookDto.title,
-                }
-            });
-
-            if(!existingTitle) {
-                const title = new TitleEntity();
-                title.title = createBookDto.title;
-                await title.save();
-
-                titleEntity = title;
-            } else {
-                titleEntity = existingTitle;
-            }
-
-            for(let i = 0; i < createBookDto.author.length; i++) {
-                const existingAuthor = await AuthorEntity.findOne({
-                    where: {
-                        name: createBookDto.author[i].name,
-                        surname: createBookDto.author[i].surname,
-                    }
-                });
-
-                if(!existingAuthor) {
-                    const author = new AuthorEntity();
-                    author.name = createBookDto.author[i].name;
-                    author.surname = createBookDto.author[i].surname;
-                    await author.save();
-
-                    authorEntities.push(author);
-                } else {
-                    authorEntities.push(existingAuthor);
-                }
-            }
-
-            for(let i = 0; i < authorEntities.length; i++) {
-                const existingTitleAuthor = await TitleAuthorEntity.findOne({
-                    relations: ['titleEntity', 'authorEntity'],
-                    where: {
-                        titleEntity: titleEntity.valueOf(),
-                        authorEntity: authorEntities[i].valueOf(),
-                    }
-                });
-
-                if(!existingTitleAuthor) {
-                    const titleAuthor = new TitleAuthorEntity();
-                    titleAuthor.titleEntity = titleEntity;
-                    titleAuthor.authorEntity = authorEntities[i];
-                    await titleAuthor.save();
-                }
-            }
-
-            const newBook = new BookEntity();
-            newBook.titleEntity = titleEntity;
-            await newBook.save();
-
-            return {
-                isSuccess: true,
-            }
-        } catch(e) {
-            return {
-                isSuccess: false,
-                msgError: e.message,
-            };
-        }
-    }
-
-    private async getOneFiltered(bookId: number): Promise<any> {
-        const book = await BookEntity.findOne({
-            relations: ['titleEntity'],
-            where: {
-                id: bookId,
-            }
-        });
-
-        const titleAuthor = await TitleAuthorEntity
-            .find({
-                relations: ['titleEntity', 'authorEntity'],
-                where: {
-                    titleEntity: book.titleEntity.valueOf(),
-                }
-            });
-
-        return {
-            id: book.id,
-            title: {
-                id: book.titleEntity.id,
-                title: book.titleEntity.title,
-            },
-            author: titleAuthor.map(item => ({
-                id: item.authorEntity.id,
-                name: item.authorEntity.name,
-                surname: item.authorEntity.surname,
-            })),
-        };
-    }
-
-    async getOne(bookId: number): Promise<GetOneBookResponse> {
-        try {
-            const book = await this.getOneFiltered(bookId);
-
-            return {
-                isSuccess: true,
-                data: book,
-            };
-        } catch(e) {
-            return {
-                isSuccess: false,
-                msgError: e.message,
-            };
-        }
-    }
-
     async update(bookId: number, updateBookDto: UpdateBookDto): Promise<UpdateBookResponse> {
         try {
             const titleEntity = await TitleEntity.findOne({
@@ -403,6 +404,88 @@ export class BookService {
                 authorEntity.name = updateBookDto.author[i].name;
                 authorEntity.surname = updateBookDto.author[i].surname;
                 await authorEntity.save();
+            }
+
+            return {
+                isSuccess: true,
+            }
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
+    }
+
+    async delete(bookId: number): Promise<DeleteBookResponse> {
+        try {
+            const bookFiltered = await this.getOneFiltered(bookId);
+
+            const bookEntity = await BookEntity.findOne({
+                relations: ['titleEntity'],
+                where: {
+                    id: bookId,
+                }
+            });
+
+            const booksWithThisTitle = await BookEntity.find({
+                where: {
+                    titleEntity: bookEntity.titleEntity.valueOf(),
+                }
+            });
+
+            if(booksWithThisTitle.length > 1) {
+
+                bookEntity.titleEntity = null;
+                await bookEntity.save();
+                await BookEntity.delete(bookId);
+
+            } else {
+                for(let i = 0; i < bookFiltered.author.length; i++) {
+                    const authorEntity = await AuthorEntity.findOne({
+                        where: {
+                            id: bookFiltered.author[i].id,
+                        }
+                    });
+
+                    const titleAuthorEntity = await TitleAuthorEntity.findOne({
+                        relations: ['titleEntity', 'authorEntity'],
+                        where: {
+                            titleEntity: bookEntity.titleEntity.valueOf(),
+                            authorEntity: authorEntity.valueOf(),
+                        }
+                    });
+
+                    const titlesWithThisAuthor = await TitleAuthorEntity.find({
+                        where: {
+                            authorEntity: authorEntity.valueOf(),
+                        }
+                    });
+
+                    if(titlesWithThisAuthor.length > 1) {
+
+                        titleAuthorEntity.titleEntity = null;
+                        titleAuthorEntity.authorEntity = null;
+                        await titleAuthorEntity.save();
+                        await TitleAuthorEntity.delete(titleAuthorEntity.id);
+
+                    } else {
+
+                        titleAuthorEntity.titleEntity = null;
+                        titleAuthorEntity.authorEntity = null;
+                        await titleAuthorEntity.save();
+                        await TitleAuthorEntity.delete(titleAuthorEntity.id);
+
+                        await AuthorEntity.delete(bookFiltered.author[i].id);
+
+                    }
+                }
+
+                bookEntity.titleEntity = null;
+                await bookEntity.save();
+                await BookEntity.delete(bookId);
+
+                await TitleEntity.delete(bookFiltered.title.id);
             }
 
             return {
