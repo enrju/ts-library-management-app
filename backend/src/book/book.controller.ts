@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller,
+    Controller, Delete,
     Get,
     Inject,
     Param,
@@ -14,7 +14,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { AccessForRolesProtectGuard } from "../guards/access-for-roles-protect.guard";
 import {
     BookState,
-    CreateBookResponse,
+    CreateBookResponse, DeleteBookResponse,
     GetAllBooksResponse,
     GetOneBookResponse, UpdateBookResponse,
     UpdateBookStateResponse,
@@ -96,5 +96,17 @@ export class BookController {
         @Body() updateBookDto: UpdateBookDto,
     ): Promise<UpdateBookResponse> {
         return this.bookService.update(bookId, updateBookDto);
+    }
+
+    @Delete('/:id')
+    @SetAccessForRoles(['admin'])
+    @UseGuards(
+        AuthGuard('jwt'),
+        AccessForRolesProtectGuard
+    )
+    async delete(
+        @Param('id') bookId: number,
+    ): Promise<DeleteBookResponse> {
+        return this.bookService.delete(bookId);
     }
 }

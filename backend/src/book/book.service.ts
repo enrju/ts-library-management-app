@@ -4,7 +4,7 @@ import { TitleEntity } from "./entities/title.entity";
 import { TitleAuthorEntity } from "./entities/title-author.entity";
 import {
     BookState,
-    CreateBookResponse,
+    CreateBookResponse, DeleteBookResponse,
     GetAllBooksResponse,
     GetOneBookResponse,
     GetUserBooksResponse, UpdateBookResponse,
@@ -403,6 +403,88 @@ export class BookService {
                 authorEntity.name = updateBookDto.author[i].name;
                 authorEntity.surname = updateBookDto.author[i].surname;
                 await authorEntity.save();
+            }
+
+            return {
+                isSuccess: true,
+            }
+        } catch(e) {
+            return {
+                isSuccess: false,
+                msgError: e.message,
+            };
+        }
+    }
+
+    async delete(bookId: number): Promise<DeleteBookResponse> {
+        try {
+            const bookFiltered = await this.getOneFiltered(bookId);
+
+            const bookEntity = await BookEntity.findOne({
+                relations: ['titleEntity'],
+                where: {
+                    id: bookId,
+                }
+            });
+
+            const booksWithThisTitle = await BookEntity.find({
+                where: {
+                    titleEntity: bookEntity.titleEntity.valueOf(),
+                }
+            });
+
+            if(booksWithThisTitle.length > 1) {
+
+                bookEntity.titleEntity = null;
+                await bookEntity.save();
+                await BookEntity.delete(bookId);
+
+            } else {
+                for(let i = 0; i < bookFiltered.author.length; i++) {
+                    const authorEntity = await AuthorEntity.findOne({
+                        where: {
+                            id: bookFiltered.author[i].id,
+                        }
+                    });
+
+                    const titleAuthorEntity = await TitleAuthorEntity.findOne({
+                        relations: ['titleEntity', 'authorEntity'],
+                        where: {
+                            titleEntity: bookEntity.titleEntity.valueOf(),
+                            authorEntity: authorEntity.valueOf(),
+                        }
+                    });
+
+                    const titlesWithThisAuthor = await TitleAuthorEntity.find({
+                        where: {
+                            authorEntity: authorEntity.valueOf(),
+                        }
+                    });
+
+                    if(titlesWithThisAuthor.length > 1) {
+
+                        titleAuthorEntity.titleEntity = null;
+                        titleAuthorEntity.authorEntity = null;
+                        await titleAuthorEntity.save();
+                        await TitleAuthorEntity.delete(titleAuthorEntity.id);
+
+                    } else {
+
+                        titleAuthorEntity.titleEntity = null;
+                        titleAuthorEntity.authorEntity = null;
+                        await titleAuthorEntity.save();
+                        await TitleAuthorEntity.delete(titleAuthorEntity.id);
+
+                        await AuthorEntity.delete(bookFiltered.author[i].id);
+
+                    }
+                }
+
+                bookEntity.titleEntity = null;
+                await bookEntity.save();
+                await BookEntity.delete(bookId);
+
+                await TitleEntity.delete(bookFiltered.title.id);
             }
 
             return {
