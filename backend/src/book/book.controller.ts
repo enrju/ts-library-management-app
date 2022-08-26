@@ -16,13 +16,14 @@ import {
     BookState,
     CreateBookResponse,
     GetAllBooksResponse,
-    GetOneBookResponse,
+    GetOneBookResponse, UpdateBookResponse,
     UpdateBookStateResponse,
     UserRole
 } from "../types";
 import { UserObj } from "../decorators/user-obj.decorator";
 import { UserEntity } from "../user/entities/user.entity";
 import { CreateBookDto } from "./dto/create-book.dto";
+import { UpdateBookDto } from "./dto/update-book.dto";
 
 @Controller('/api/v1/books')
 export class BookController {
@@ -82,5 +83,18 @@ export class BookController {
         @Param('id') bookId: number
     ): Promise<GetOneBookResponse> {
         return this.bookService.getOne(bookId);
+    }
+
+    @Patch('/:id')
+    @SetAccessForRoles(['admin'])
+    @UseGuards(
+        AuthGuard('jwt'),
+        AccessForRolesProtectGuard
+    )
+    async update(
+        @Param('id') bookId: number,
+        @Body() updateBookDto: UpdateBookDto,
+    ): Promise<UpdateBookResponse> {
+        return this.bookService.update(bookId, updateBookDto);
     }
 }
