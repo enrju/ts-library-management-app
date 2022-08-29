@@ -281,6 +281,238 @@
             await setHandleUserPanel();
         }
 
+        const getAddBookForm = async (div) => {}
+        const getEditBookForm = async (div, bookId) => {}
+
+        const setHandleAdminPanel = async () => {
+            const panel = document.querySelector(".panel");
+            const userIntroduction = document.querySelector(".user-introduce");
+            const formSearchUser = document.querySelector(".search-user");
+            const ulReservedBooks = document.querySelector(".user-books-reserved");
+            const ulRentedBooks = document.querySelector(".user-books-rented");
+            const panelAddBook = document.querySelector(".panel-add-book");
+            const btnAddBook = document.querySelector(".btn-add-book");
+            const ulBooksInLibrary = document.querySelector(".books-in-library");
+
+            const cookies = getObjectOfCookies();
+            userIntroduction.textContent = `Witaj: ${cookies.name} ${cookies.surname}`;
+
+            formSearchUser.addEventListener("submit", async e => {
+                e.preventDefault();
+
+                const login = e.target.elements['user-login'].value;
+
+                if(login.length === 0) {
+                    return;
+                }
+
+                const res = await fetch(`http://localhost:3001/api/v1/users/id/bylogin/${login}`, {
+                    method: 'GET',
+                    credentials: "include",
+                });
+
+                const data = await res.json();
+
+                if(data) {
+                    const userId = data.data.id;
+
+                    // --- user books ---
+                    const userBooksRes = await fetch(`http://localhost:3001/api/v1/users/${userId}/books`, {
+                        method: 'GET',
+                        credentials: "include",
+                    });
+
+                    const userBooksData = await userBooksRes.json();
+                    const userBooks = userBooksData.data;
+
+                    if(userBooks) {
+                        const reservedBooks = userBooks
+                            .filter(item => item.state === 'reserved');
+
+                        if(reservedBooks.length > 0) {
+                            reservedBooks.forEach((item, index) => {
+                                const li = document.createElement("li");
+
+                                li.textContent =
+                                    String(index + 1) + " | " +
+                                    item.title + " | " +
+                                    item.author + " | " +
+                                    "ważne do: " + item.returnUntil.substring(0, 10) + " | ";
+
+                                const btnCancel = document.createElement("button");
+                                btnCancel.textContent = "Anuluj";
+                                btnCancel.addEventListener("click", async e => {
+                                    e.preventDefault();
+                                    const id = item.id;
+                                    const state = 'available';
+
+                                    const res = await fetch(`http://localhost:3001/api/v1/books/${id}/state/${state}`, {
+                                        method: 'PATCH',
+                                        credentials: "include",
+                                    });
+
+                                    const data = await res.json();
+
+                                    location.reload();
+                                });
+                                li.appendChild(btnCancel);
+
+                                const btnRent = document.createElement("button");
+                                btnRent.textContent = "Wypożycz";
+                                btnRent.addEventListener("click", async e => {
+                                    e.preventDefault();
+                                    const id = item.id;
+                                    const state = 'rented';
+
+                                    const res = await fetch(`http://localhost:3001/api/v1/books/${id}/state/${state}`, {
+                                        method: 'PATCH',
+                                        credentials: "include",
+                                    });
+
+                                    const data = await res.json();
+
+                                    location.reload();
+                                });
+                                li.appendChild(btnRent);
+
+                                ulReservedBooks.appendChild(li);
+                            });
+                        }
+
+                        const rentedBooks = userBooks
+                            .filter(item => item.state === 'rented');
+
+                        if(rentedBooks.length > 0) {
+                            rentedBooks.forEach((item, index) => {
+                                const li = document.createElement("li");
+                                li.textContent =
+                                    String(index + 1) + " | " +
+                                    item.title + " | " +
+                                    item.author + " | " +
+                                    "oddaj do: " + item.returnUntil.substring(0, 10) + " |";
+
+                                const btnReturn = document.createElement("button");
+                                btnReturn.textContent = "Oddaj";
+                                btnReturn.addEventListener("click", async e => {
+                                    e.preventDefault();
+                                    const id = item.id;
+                                    const state = 'available';
+
+                                    const res = await fetch(`http://localhost:3001/api/v1/books/${id}/state/${state}`, {
+                                        method: 'PATCH',
+                                        credentials: "include",
+                                    });
+
+                                    const data = await res.json();
+
+                                    location.reload();
+                                });
+                                li.appendChild(btnReturn);
+
+                                ulRentedBooks.appendChild(li);
+                            });
+                        }
+
+                    }
+
+                }
+            });
+
+            btnAddBook.addEventListener("click", async () => {
+                await getAddBookForm(panelAddBook);
+            });
+
+            // --- all books ---
+            const allBooksRes = await fetch('http://localhost:3001/api/v1/books', {
+                method: 'GET',
+                credentials: "include",
+            });
+            const allBooksData = await allBooksRes.json();
+            const allBooks = allBooksData.data;
+
+            if(allBooks) {
+                if(allBooks.length > 0) {
+                    allBooks.forEach((item, index) => {
+                        const li = document.createElement("li");
+                        li.textContent =
+                            String(index + 1) + " | " +
+                            item.title + " | " +
+                            item.author + " | " +
+                            item.state + " | ";
+
+                        if(item.state === 'available') {
+                            const div = document.createElement("div");
+
+                            const btnEdit = document.createElement("button");
+                            btnEdit.textContent = "Edytuj";
+                            btnEdit.addEventListener("click", async e => {
+                                // e.preventDefault();
+                                const id = item.id;
+
+                                await getEditBookForm(div, id);
+                            });
+                            li.appendChild(btnEdit);
+
+                            const btnDelete = document.createElement("button");
+                            btnDelete.textContent = "Usuń";
+                            btnDelete.addEventListener("click", async e => {
+                                e.preventDefault();
+                                const id = item.id;
+
+                                const res = await fetch(`http://localhost:3001/api/v1/books/${id}`, {
+                                    method: 'DELETE',
+                                    credentials: "include",
+                                });
+
+                                const data = await res.json();
+
+                                location.reload();
+                            });
+                            li.appendChild(btnDelete);
+
+                            li.appendChild(div);
+                        }
+
+                        if(item.state === 'reserved') {
+                            const btn = document.createElement("button");
+                            btn.textContent = "Anuluj";
+                            btn.addEventListener("click", async e => {
+                                e.preventDefault();
+                                const id = item.id;
+                                const state = 'available';
+
+                                const res = await fetch(`http://localhost:3001/api/v1/books/${id}/state/${state}`, {
+                                    method: 'PATCH',
+                                    credentials: "include",
+                                });
+
+                                const data = await res.json();
+
+                                location.reload();
+                            });
+                            li.appendChild(btn);
+                        }
+
+                        ulBooksInLibrary.appendChild(li);
+                    });
+                }
+            }
+        }
+        const getAdminPanel = async (div) => {
+            const logoutDiv = document.createElement('div');
+            await getLogoutBtn(logoutDiv);
+
+            const res = await fetch('/admin-panel.html', {
+                method: 'GET',
+            });
+
+            const data = await res.text();
+
+            div.innerHTML = data;
+
+            document.body.appendChild(div);
+            await setHandleAdminPanel();
+        }
 
         (async () => {
             const cookies = getObjectOfCookies();
@@ -292,7 +524,7 @@
                         await getUserPanel(div);
                         break;
                     case 'admin':
-                        await getLogoutBtn(div);
+                        await getAdminPanel(div);
                         break;
                 }
             } else {
