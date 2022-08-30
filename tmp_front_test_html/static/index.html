@@ -281,7 +281,70 @@
             await setHandleUserPanel();
         }
 
-        const getAddBookForm = async (div) => {}
+        const setHandleAddBookForm = async () => {
+            const addBookForm = document.querySelector(".add-book-form");
+            const addAuthorBtn = document.querySelector(".add-book-author");
+            const authorsDiv = document.querySelector(".authors");
+            const authors = [];
+
+            const updateAuthors = () => {
+                authorsDiv.textContent = "";
+                if(authors.length > 0) {
+                    authorsDiv.textContent = "Autorzy:"
+                    authors.forEach(item => {
+                        const p = document.createElement("p");
+                        p.textContent = `${item.name} ${item.surname}`;
+                        authorsDiv.appendChild(p);
+                    });
+
+                } else {
+                    authorsDiv.textContent = "nie dodado autora";
+                }
+            }
+
+            updateAuthors();
+
+            addAuthorBtn.addEventListener("click", e => {
+                const authorName = document.querySelector('input[name="author-name"]').value;
+                const authorSurname = document.querySelector('input[name="author-surname"]').value;
+
+                authors.push({
+                    name: authorName,
+                    surname: authorSurname
+                });
+
+                updateAuthors();
+            });
+
+            addBookForm.addEventListener("submit", async e => {
+                const title = e.target.elements['title'].value;
+
+                const res = await fetch(`http://localhost:3001/api/v1/books`, {
+                    method: 'POST',
+                    credentials: "include",
+                    body: JSON.stringify({
+                        title,
+                        author: authors,
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await res.json();
+            });
+        }
+        const getAddBookForm = async (div) => {
+            const res = await fetch('/add-book-form.html', {
+                method: 'GET',
+            });
+
+            const data = await res.text();
+
+            div.innerHTML = data;
+
+            await setHandleAddBookForm();
+        }
         const getEditBookForm = async (div, bookId) => {}
 
         const setHandleAdminPanel = async () => {
