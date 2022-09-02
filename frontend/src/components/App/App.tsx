@@ -3,6 +3,7 @@ import './App.scss';
 import {getObjectOfCookies} from "../../utils/get-object-of-cookies";
 import {UserRole} from 'types';
 import {LoginForm} from "../Form/Login-form";
+import {RegisterForm} from "../Form/Register-form";
 
 export const App = () => {
     const [msgError, setMsgError] = useState<string | null>(null);
@@ -31,7 +32,12 @@ export const App = () => {
                     setShowRegisterForm={setShowRegisterForm}
                 />;
         } else if(cookies.isRegisterForm === 'true') {
-            componentToDisplay = <h1>Register Form</h1>;
+            componentToDisplay =
+                <RegisterForm
+                    msgError={msgError}
+                    setMsgError={setMsgError}
+                    setShowRegisterForm={setShowRegisterForm}
+                />;
         }
     }
 

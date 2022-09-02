@@ -1,8 +1,15 @@
 import React, {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
-import './Login-form.scss';
+import { LoginAuthRequest } from 'types';
+import './Form.scss';
 
-export const LoginForm = (props: any) => {
-    const [loginFormData, setLoginFormData] = useState({
+interface Props {
+    msgError: string | null;
+    setMsgError: Function;
+    setShowRegisterForm: Function;
+}
+
+export const LoginForm = (props: Props) => {
+    const [loginFormData, setLoginFormData] = useState<LoginAuthRequest>({
         email: '',
         password: '',
     });
@@ -40,37 +47,37 @@ export const LoginForm = (props: any) => {
     }
 
     return (
-        <div className="Login-form__container">
+        <div className="Form__container">
             <form
-                className="Login-form__form"
+                className="Form__form"
                 onSubmit={submitForm}
             >
-                <h2 className="Login-form__title">Zaloguj się</h2>
-                <div className="Login-form__content">
-                    <label className="Login-form__label">Email:
+                <h2 className="Form__title">Zaloguj się</h2>
+                <div className="Form__content">
+                    <label className="Form__label">Email:
                         <input
-                            className="Login-form__input"
+                            className="Form__input"
                             type="text"
                             name="email"
                             value={loginFormData.email}
                             onChange={changeInput}
                         />
                     </label>
-                    <label className="Login-form__label">Password:
+                    <label className="Form__label">Password:
                         <input
-                            className="Login-form__input"
+                            className="Form__input"
                             type="text"
                             name="password"
                             value={loginFormData.password}
                             onChange={changeInput}
                         />
                     </label>
-                    {props.msgError ? <p className="Login-form__info">{props.msgError}</p> : null}
+                    {props.msgError ? <p className="Form__info">{props.msgError}</p> : null}
 
-                    <button className="Login-form__button" type="submit">Zaloguj</button>
+                    <button className="Form__button" type="submit">Zaloguj</button>
 
                     <div>
-                        <button className="Login-form__button" onClick={clickBtnGoToRegister}>Idź do rejestracji</button>
+                        <button className="Form__button" onClick={clickBtnGoToRegister}>Idź do rejestracji</button>
                     </div>
                 </div>
             </form>
