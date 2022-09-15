@@ -1,0 +1,38 @@
+$panel-title-bgc: #e7e7e7;
+
+.Books-list {
+  border-radius: 15px;
+
+  &__header {
+    background-color: $panel-title-bgc;
+  }
+
+  &__list {
+    list-style: none;
+  }
+}
+
+.Books-list-item {
+  text-align: left;
+  border-bottom: 1px solid gray;
+
+  &__column {
+    display: inline-block;
+    width: 20%;
+    padding: 5px;
+    vertical-align: top;
+  }
+
+  &__column--no {
+    width: 5%;
+  }
+
+  &__column--last {
+    width: max-content;
+  }
+
+  &__button {
+    padding: 10px 30px;
+    cursor: pointer;
+  }
+}
