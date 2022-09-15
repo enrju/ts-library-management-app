@@ -1,0 +1,16 @@
+.Search {
+  border: 2px solid black;
+  &__label {
+  }
+
+  &__input {
+    margin: 5px 0 5px 5px;
+    padding: 10px 5px;
+  }
+
+  &__button {
+    margin: 5px 0 5px 5px;
+    padding: 10px 30px;
+    cursor: pointer;
+  }
+}

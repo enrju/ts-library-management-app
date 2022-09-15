@@ -4,6 +4,7 @@ import {getObjectOfCookies} from "../../utils/get-object-of-cookies";
 import {UserRole} from 'types';
 import {LoginForm} from "../Form/Login-form";
 import {RegisterForm} from "../Form/Register-form";
+import {UserPanel} from "../Panel/User-panel";
 
 export const App = () => {
     const [msgError, setMsgError] = useState<string | null>(null);
@@ -16,7 +17,11 @@ export const App = () => {
     if(cookies.logged) {
         switch(cookies.role) {
             case UserRole.User:
-                componentToDisplay = <h1>User Panel</h1>;
+                componentToDisplay =
+                    <UserPanel
+                        userName={cookies.name}
+                        userSurname={cookies.surname}
+                    />;
                 break;
             case UserRole.Admin:
                 componentToDisplay = <h1>Admin Panel</h1>;
