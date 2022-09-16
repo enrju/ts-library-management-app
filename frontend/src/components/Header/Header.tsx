@@ -2,6 +2,7 @@ import React, {MouseEvent} from "react";
 import './Header.scss';
 
 interface Props {
+    title: string;
     userName: string;
     userSurname: string;
 }
@@ -21,7 +22,7 @@ export const Header = (props: Props) => {
 
     return (
         <div className="Header">
-            <h1 className="Header__title">PANEL UŻYTKOWNIKA</h1>
+            <h1 className="Header__title">{props.title}</h1>
             <p className="Header__user-introduction">
                 {`Witaj: ${props.userName} ${props.userSurname}`}
             </p>
