@@ -77,6 +77,7 @@ export const UserPanel = (props: Props) => {
         <div className="Panel">
             <div className="Panel__container">
                 <Header
+                    title="PANEL UŻYTKOWNIKA"
                     userName={props.userName}
                     userSurname={props.userSurname}
                 />
@@ -109,7 +110,9 @@ export const UserPanel = (props: Props) => {
                     <BooksList
                         title="KSIĄŻKI W BIBLIOTECE"
                         books={libraryBooks}
-                        search="wpisz tytuł lub autora:"
+                        searchDescription="wpisz tytuł lub autora:"
+                        searchName="book-criteria"
+                        searchOnClick={()=>{}}
                         onAddButtons={(state: BookState, id: number) => {
                             if(state === BookState.Available) {
                                 return (

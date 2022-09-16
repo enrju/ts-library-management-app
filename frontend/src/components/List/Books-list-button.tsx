@@ -1,7 +1,7 @@
 import React from "react";
 
 interface Props {
-    id: number;
+    id?: number;
     onClick: Function;
     children?: any;
 }
