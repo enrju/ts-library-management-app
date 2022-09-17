@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, MouseEvent} from "react";
 import './Panel.scss';
 import {Header} from "../Header/Header";
 import {Search} from "../Search/Search";
 import {BooksList} from "../List/Books-list";
 import {BooksListButton} from "../List/Books-list-button";
 import {BookState, UserBook } from "types";
+import {AddBookForm} from "../Form/Add-book-form";
 
 interface Props {
     userName: string;
@@ -17,6 +18,9 @@ export const AdminPanel = (props: Props) => {
     const [rentedBooks, setRentedBooks] = useState<UserBook[]>([]);
 
     const [libraryBooks, setLibraryBooks] = useState<UserBook[]>([]);
+
+    const [showAddBookForm, setShowAddBookForm] = useState<boolean>(false);
+    const [showEditBookForm, setShowEditBookForm] = useState<boolean>(false);
 
     const searchUserInputName = "user-login";
     const updateUserBooks = async (): Promise<void> => {
@@ -193,11 +197,18 @@ export const AdminPanel = (props: Props) => {
                         searchName="book-criteria"
                         searchOnClick={()=>{}}
                         jsx={
-                            <BooksListButton
-                                onClick={() => {}}
-                            >
+                            showAddBookForm
+                                ? <AddBookForm
+                                    setShowForm={setShowAddBookForm}
+                                />
+                                : <button
+                                    className="Books-list-item__button"
+                                    onClick={() => {
+                                        setShowAddBookForm(true);
+                                    }}
+                                >
                                 Dodaj nową książkę
-                            </BooksListButton>
+                            </button>
                         }
                         onAddButtons={(state: BookState, id: number) => {
                             if(state === BookState.Available) {
