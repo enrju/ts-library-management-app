@@ -36,6 +36,11 @@ $form-info-bgc: #ffc3c3;
 
   &__label {
     display: block;
+
+    &--edit {
+      display: inline-block;
+      margin-right: 10px;
+    }
   }
 
   &__input {

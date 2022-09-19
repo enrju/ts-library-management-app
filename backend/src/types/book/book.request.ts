@@ -10,6 +10,6 @@ export interface CreateBookRequest {
 }
 
 export interface UpdateBookRequest {
-    title: {id: number, title: string};
+    title: {id: number, title: string} | null;
     author: BookAuthor[];
 }

@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, MouseEvent} from "react";
 import './Panel.scss';
 import {Header} from "../Header/Header";
 import {Search} from "../Search/Search";
 import {BooksList} from "../List/Books-list";
 import {BooksListButton} from "../List/Books-list-button";
 import {BookState, UserBook } from "types";
+import {AddBookForm} from "../Form/Add-book-form";
+import {EditBookForm} from "../Form/Edit-book-form";
 
 interface Props {
     userName: string;
@@ -17,6 +19,9 @@ export const AdminPanel = (props: Props) => {
     const [rentedBooks, setRentedBooks] = useState<UserBook[]>([]);
 
     const [libraryBooks, setLibraryBooks] = useState<UserBook[]>([]);
+
+    const [showAddBookForm, setShowAddBookForm] = useState<boolean>(false);
+    const [showEditBookFormForBookId, setShowEditBookFormForBookId] = useState<number | null>(null);
 
     const searchUserInputName = "user-login";
     const updateUserBooks = async (): Promise<void> => {
@@ -193,31 +198,57 @@ export const AdminPanel = (props: Props) => {
                         searchName="book-criteria"
                         searchOnClick={()=>{}}
                         jsx={
-                            <BooksListButton
-                                onClick={() => {}}
-                            >
+                            showAddBookForm
+                                ? <AddBookForm
+                                    setShowAddBookForm={setShowAddBookForm}
+                                />
+                                : <button
+                                    className="Books-list-item__button"
+                                    onClick={() => {
+                                        setShowAddBookForm(true);
+                                    }}
+                                >
                                 Dodaj nową książkę
-                            </BooksListButton>
+                            </button>
                         }
                         onAddButtons={(state: BookState, id: number) => {
                             if(state === BookState.Available) {
-                                return (
-                                    <>
-                                        <BooksListButton
-                                            id={id}
-                                            onClick={()=>{}}
-                                        >
-                                            Edytuj
-                                        </BooksListButton>
+                                if(showEditBookFormForBookId === id) {
+                                    const allP = document.querySelectorAll('p.Books-list-item__column--last');
+                                    allP.forEach(item => {
+                                        if(item.firstChild !== null && item.firstChild.nodeName === 'FORM') {
+                                            item.classList.add('Books-list-item__column--100');
+                                        }
+                                    });
 
-                                        <BooksListButton
-                                            id={id}
-                                            onClick={deleteBook}
-                                        >
-                                            Usuń
-                                        </BooksListButton>
-                                    </>
-                                )
+                                    return (
+                                        <EditBookForm
+                                            bookId={id}
+                                            setShowEditBookFormForBookId={setShowEditBookFormForBookId}
+                                        />
+                                    )
+                                } else {
+                                    return (
+                                        <>
+                                            <BooksListButton
+                                                id={id}
+                                                onClick={()=>{
+                                                    setShowEditBookFormForBookId(id);
+                                                }}
+                                            >
+                                                Edytuj
+                                            </BooksListButton>
+
+                                            <BooksListButton
+                                                id={id}
+                                                onClick={deleteBook}
+                                            >
+                                                Usuń
+                                            </BooksListButton>
+
+                                        </>
+                                    )
+                                }
                             }
 
                             if(state === BookState.Reserved) {

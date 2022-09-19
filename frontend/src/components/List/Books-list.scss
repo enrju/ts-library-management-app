@@ -9,6 +9,8 @@ $panel-title-bgc: #e7e7e7;
 
   &__div {
     padding: 5px;
+    border: 2px solid black;
+    border-top: none;
   }
 
   &__list {
@@ -34,6 +36,10 @@ $panel-title-bgc: #e7e7e7;
 
   &__column--last {
     width: max-content;
+  }
+
+  &__column--100 {
+    width: 100%;
   }
 
   &__button {
