@@ -6,6 +6,7 @@ import {BooksList} from "../List/Books-list";
 import {BooksListButton} from "../List/Books-list-button";
 import {BookState, UserBook } from "types";
 import {AddBookForm} from "../Form/Add-book-form";
+import {EditBookForm} from "../Form/Edit-book-form";
 
 interface Props {
     userName: string;
@@ -20,7 +21,7 @@ export const AdminPanel = (props: Props) => {
     const [libraryBooks, setLibraryBooks] = useState<UserBook[]>([]);
 
     const [showAddBookForm, setShowAddBookForm] = useState<boolean>(false);
-    const [showEditBookForm, setShowEditBookForm] = useState<boolean>(false);
+    const [showEditBookFormForBookId, setShowEditBookFormForBookId] = useState<number | null>(null);
 
     const searchUserInputName = "user-login";
     const updateUserBooks = async (): Promise<void> => {
@@ -199,7 +200,7 @@ export const AdminPanel = (props: Props) => {
                         jsx={
                             showAddBookForm
                                 ? <AddBookForm
-                                    setShowForm={setShowAddBookForm}
+                                    setShowAddBookForm={setShowAddBookForm}
                                 />
                                 : <button
                                     className="Books-list-item__button"
@@ -212,23 +213,42 @@ export const AdminPanel = (props: Props) => {
                         }
                         onAddButtons={(state: BookState, id: number) => {
                             if(state === BookState.Available) {
-                                return (
-                                    <>
-                                        <BooksListButton
-                                            id={id}
-                                            onClick={()=>{}}
-                                        >
-                                            Edytuj
-                                        </BooksListButton>
+                                if(showEditBookFormForBookId === id) {
+                                    const allP = document.querySelectorAll('p.Books-list-item__column--last');
+                                    allP.forEach(item => {
+                                        if(item.firstChild !== null && item.firstChild.nodeName === 'FORM') {
+                                            item.classList.add('Books-list-item__column--100');
+                                        }
+                                    });
 
-                                        <BooksListButton
-                                            id={id}
-                                            onClick={deleteBook}
-                                        >
-                                            Usuń
-                                        </BooksListButton>
-                                    </>
-                                )
+                                    return (
+                                        <EditBookForm
+                                            bookId={id}
+                                            setShowEditBookFormForBookId={setShowEditBookFormForBookId}
+                                        />
+                                    )
+                                } else {
+                                    return (
+                                        <>
+                                            <BooksListButton
+                                                id={id}
+                                                onClick={()=>{
+                                                    setShowEditBookFormForBookId(id);
+                                                }}
+                                            >
+                                                Edytuj
+                                            </BooksListButton>
+
+                                            <BooksListButton
+                                                id={id}
+                                                onClick={deleteBook}
+                                            >
+                                                Usuń
+                                            </BooksListButton>
+
+                                        </>
+                                    )
+                                }
                             }
 
                             if(state === BookState.Reserved) {

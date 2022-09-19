@@ -38,6 +38,10 @@ $panel-title-bgc: #e7e7e7;
     width: max-content;
   }
 
+  &__column--100 {
+    width: 100%;
+  }
+
   &__button {
     padding: 10px 30px;
     cursor: pointer;

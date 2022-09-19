@@ -3,7 +3,7 @@ import { CreateBookRequest } from 'types';
 import './Form.scss';
 
 interface Props {
-    setShowForm: Function;
+    setShowAddBookForm: Function;
 }
 
 export const AddBookForm = (props: Props) => {
@@ -58,7 +58,7 @@ export const AddBookForm = (props: Props) => {
 
         const data = await res.json();
 
-        props.setShowForm(false);
+        props.setShowAddBookForm(false);
     }
 
     return (
