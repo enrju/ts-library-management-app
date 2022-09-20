@@ -57,9 +57,7 @@ export const RegisterForm = (props: Props) => {
                 className="Form__form"
                 onSubmit={submitForm}
             >
-                <h2 className="Form__title">Zarejestruj się
-                    <p className="Form__info">UWAGA - BEZ WALIDACJI (FE i BE) - przechodzą puste pola</p>
-                </h2>
+                <h2 className="Form__title">Zarejestruj się</h2>
                 <div className="Form__content">
                     <label className="Form__label">Imię:
                         <input
