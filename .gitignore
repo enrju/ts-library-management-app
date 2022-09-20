@@ -4,4 +4,15 @@
 # --- BACK ---
 /backend/dist
 /backend/node_modules
-/backend/config/config.ts
+/backend/config/app-config.ts
+/backend/config/orm-config.ts
+/backend/config/auth-config.ts
+
+# --- TMP-FRONT (test HTML) ---
+/tmp_front_test_html/dist
+/tmp_front_test_html/node_modules
+
+# --- FRONT ---
+/frontend/node_modules
+/frontend/build
+/frontend/coverage

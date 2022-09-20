@@ -1,0 +1,49 @@
+$panel-title-bgc: #e7e7e7;
+
+.Books-list {
+  border-radius: 15px;
+
+  &__header {
+    background-color: $panel-title-bgc;
+  }
+
+  &__div {
+    padding: 5px;
+    border: 2px solid black;
+    border-top: none;
+  }
+
+  &__list {
+    list-style: none;
+    margin-bottom: 5px;
+  }
+}
+
+.Books-list-item {
+  text-align: left;
+  border-bottom: 1px solid gray;
+
+  &__column {
+    display: inline-block;
+    width: 20%;
+    padding: 5px;
+    vertical-align: top;
+  }
+
+  &__column--no {
+    width: 5%;
+  }
+
+  &__column--last {
+    width: max-content;
+  }
+
+  &__column--100 {
+    width: 100%;
+  }
+
+  &__button {
+    padding: 10px 30px;
+    cursor: pointer;
+  }
+}

@@ -1,12 +1,14 @@
 # Application "Library Management App"
 
 ## Description
-It is an online library management application where users can borrow books for a certain period of time.
-The application has two interfaces:
+It is an online library management application where users can borrow books for a certain period of time. The
+application has two interfaces:
+
 - User Interface
-- Administrator's (librarian's) interface
+- Administrator's (librarian's) Interface
 
 Registered and logged in users can:
+
 - browse books from the library
   (status should be visible: rented, available, booked)
 - filter books by category, author, title
@@ -17,6 +19,7 @@ Registered and logged in users can:
   (books borrowed, history of borrowings, reserved books)
 
 Registered and logged in admins can:
+
 - give reserved books (change of status to: borrowed)
 - get borrowed books (status change to: available)
 - browse user accounts (user account search by: user login)
@@ -29,81 +32,89 @@ Registered and logged in admins can:
   (the borrowing period was assumed to be 14 days)
 
 ## Technology stack and techniques used
+
+### Data-base
 - MySQL
-- Express.js
-- HTML, CSS (temporary static front-end)
 
-- TypeScript
+### Back-end
+- Nest.js (TypeScript)
+- TypeORM (MySQL)
 - Active Record Pattern
+- Type sharing between Front-end and Back-end
+- Used packages:
+  - bcrypt
+  - cookie-parser
+  - cors
+  - mysql2
+  - passport
+  - passport-jwt
+  - typeorm
+  - uuid
 
-## What has been implemented so far (version: 0.2.0 - prototype-1)
-Due to a very extensive issue, the focus was first on the main functionalities of the application, i.e. user logging into the system, user panel management and administrator panel management.
+### Front-end
+- React.js (TypeScript)
+- SCSS
+- Controlled Component Technic
+- Used packages:
+  - node-sass
 
-1. Temporary front-end using static files on the backend in
-   directory: public
+### (tmp) Front-end (static files)
+- Express.js
+- HTML, CSS in HTML, JavaScript (temporary static front-end)
 
-2. Logging the user in and displaying the user/admin panel
-   - it was assumed that we have user and admin accounts in DB (add manually)
-   
-     NOTE: at this stage we don't hash passwords, we keep them as plaintext in DB
-   - only logging into the system
-   - very simple authorization and authentication using:
-     - cookies
-     - an array with sessions (id, user-role)
-   - after logging in, we check the user's permissions
-   
-3. Display the user panel
-     - reserved books
-     ("Cancel" button available)
-     - borrowed books
-     - all books in the library
-     ("Reserve" button available)
-     - cancelling the reservation
-     ("Cancel" button)
-     - reservation of an available book of books in the library
-     ("Reserve" button)
-     NOTE: borrowing and returning the book only via the admin
+## Database structure
+<div align="center"> 
+  <img src="https://user-images.githubusercontent.com/76522657/191216365-ca0c1e52-7c27-47da-b568-eb04fc7908ef.png" alt="screenshot" />
+</div>
 
-4. Displaying the admin panel
-    - searching for a user by login
-    - reserved books by a selected user (available buttons: "Cancel", "Rent")
-    NOTE: rental only possible for earlier
-    reserved books by the user
-    - books borrowed by a selected user
-    (available buttons: "Return")
-    - all books in the library
-    (available buttons: "Add new", "Edit", "Delete")
-    - searching for a user
-    (displays of his account status: books borrowed, reserved)
-    ("Search" button)
-    - cancelling the reservation
-    ("Cancel" button) (works as in the user panel)
-    - borrowing a book
-    ("Rent" button)
-    - take the book back to the library
-    ("Return" button)
-    - adding a new book to the library
-    ("Add new book" button)
-    - editing a book in the library (title, author)
-    ("Edit" button)
-    - deleting a book from the library
-    (checking if the title and author are used in other books)
-    (if not, we also delete the title and/or author)
-    ("Delete" button)
+## Endpoints (REST API)
+| HTTP method | endpoint | what does it do | access |
+|-------------|----------|-----------------|--------|
+| (POST) | http://localhost:3001/api/v1/auth/login | login user | user, admin |
+| (GET) | http://localhost:3001/api/v1/auth/logout | logout user | user, admin |
+| (POST) | http://localhost:3001/api/v1/books | add new book | admin |
+| (GET) | http://localhost:3001/api/v1/books | get all books | user, admin |
+| (GET) | http://localhost:3001/api/v1/books/:id | get a book with id | admin |
+| (PATCH) | http://localhost:3001/api/v1/books/:id/state/:state | change state of book with id | user (available, reserved), admin (available, rented) |
+| (PATCH) | http://localhost:3001/api/v1/books/:id | edit a book with id | admin |
+| (DELETE) | http://localhost:3001/api/v1/books/:id | delete a book with id | admin |
+| (POST) | http://localhost:3001/api/v1/users/register | register new user | --- |
+| (GET) | http://localhost:3001/api/v1/users/id/books | get books for logged user | user |
+| (GET) | http://localhost:3001/api/v1/users/:id/books | get books for selected user by admin | admin |
+| (GET) | http://localhost:3001/api/v1/users/id/bylogin/:login | get user id by user login | admin |
+
+## How does it work
+<div align="center"> 
+  <img src="https://user-images.githubusercontent.com/76522657/191238451-7d42646c-d7b8-44fd-8666-b05ad1cf3c0d.png" alt="screenshot" />
+<img src="https://user-images.githubusercontent.com/76522657/191238619-17e98391-a87e-44a8-8a5e-21b1d0171fb7.png" alt="screenshot" />
+<img src="https://user-images.githubusercontent.com/76522657/191238811-833fe149-95d4-4637-b1fd-ab7245653b1c.png" alt="screenshot" />
+<img src="https://user-images.githubusercontent.com/76522657/191238993-1be27c92-bea4-48e8-b912-19498af27a59.png" alt="screenshot" />
+<img src="https://user-images.githubusercontent.com/76522657/191239166-f1f9ce6e-775a-4fe3-b78d-1810a21f6bb8.png" alt="screenshot" />
+<img src="https://user-images.githubusercontent.com/76522657/191239333-7beacbbe-b5b3-45cb-91a1-c9b5070e09f2.png" alt="screenshot" />
+<img src="https://user-images.githubusercontent.com/76522657/191239505-2352a23c-be71-419d-81a2-595bd7847b41.png" alt="screenshot" />
+</div>
 
 ## How to install
-1. open the console
+1. open the main project directory in the console
 2. cd backend
 3. npm install
 4. run the XAMPP application (Apache and MySQL)
 5. create any database (e.g. library_app)
-6. import the sample database from db_example/db_tables_example.sql
+6. import the sample database from db_example/v1_0_0_db_tables_example.sql
+7. cd frontend
+8. npm install
+9. (optional) cd tmp_front_test_html
+10. (optional) npm install
 
 ## How to run
 1. run the XAMPP application (Apache and MySQL)
-2. open the console
+2. open the main project directory in the console
 3. cd backend
-4. npm start
-5. run the browser
-6. enter: localhost:3001
-7. enter: login and password (data in db_example in 'users' table)
+4. nest start --watch [(optional): npx nest start --watch] (working on localhost:3001)
+5. cd frontend
+6. npm start (working on localhost:3000)
+7. run the browser
+8. enter: localhost:3000
+9. enter: login and password (data in Data-base in 'user_entity' table, login: email, password: the beginning of the
+   email, e.g. login: tester-1@test.com, password: tester-1)
+10. (optional) open e.g. phpMyAdmin to see changes in Database tables

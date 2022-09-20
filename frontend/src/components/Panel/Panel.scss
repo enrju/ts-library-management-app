@@ -1,0 +1,25 @@
+$panel-title-bgc: #e7e7e7;
+$panel-border-bgc: #bebebe;
+
+.Panel {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+
+  &__container {
+    width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    border: 2px solid $panel-border-bgc;
+    border-radius: 5px;
+    box-shadow: #bebebe 0px 0px 10px;
+  }
+
+  &__section {
+    margin: 10px 5px;
+  }
+
+  &__content {
+    padding: 5px;
+  }
+}
